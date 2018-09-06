@@ -1,3 +1,4 @@
+from todoist.api import TodoistAPI
 from flask import Flask, request
 import logging, os, requests
 
@@ -22,12 +23,15 @@ def callback():
     data = {'client_id' : os.getenv('CLIENT_ID'), 'client_secret' : os.getenv('CLIENT_SECRET'), 'code' : code}
     # sending post request and saving response as response object
     r = requests.post(url=os.getenv('API_TOKEN_EX'), data=data)
-    print(r)
 
     # extracting response text
     content = r.json()
     access_token = content['access_token']
     print(access_token)
+    api = TodoistAPI(access_token)
+    api.sync()
+    print(api.state['items'])
+
     return 'Complete'
 
 

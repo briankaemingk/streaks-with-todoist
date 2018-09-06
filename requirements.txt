@@ -13,5 +13,6 @@ public==1.0.3
 python-dotenv==0.9.1
 query-string==1.0.2
 requests==2.19.1
+todoist-python==7.0.18
 urllib3==1.23
 Werkzeug==0.14.1
