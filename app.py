@@ -20,10 +20,11 @@ def callback():
     print(r)
 
     # extracting response text
-    pastebin_url = r.text
-    print("The pastebin URL is:%s" % pastebin_url)
+    #pastebin_url = r.text
+    #print("The pastebin URL is:%s" % pastebin_url)
 
-    #content = request.get_json()
+    content = r.get_json()
+    print(content)
     return 'Complete'
 
 
