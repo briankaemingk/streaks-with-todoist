@@ -25,8 +25,9 @@ def callback():
     print(r)
 
     # extracting response text
-    pastebin_url = r.text
-    print("The pastebin URL is:%s" % pastebin_url)
+    content = r.json
+    access_token = content['access_token']
+    print(access_token)
 
     #content = r.get_json()
     #print(content)
