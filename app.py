@@ -25,12 +25,9 @@ def callback():
     print(r)
 
     # extracting response text
-    content = r.json
+    content = r.get_json()
     access_token = content['access_token']
     print(access_token)
-
-    #content = r.get_json()
-    #print(content)
     return 'Complete'
 
 
