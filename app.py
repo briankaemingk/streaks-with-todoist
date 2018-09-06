@@ -12,7 +12,7 @@ def callback():
     code = request.args.get('code')
     state = request.args.get('state')
     error = request.args.get('error')
-    logging.warning(code + ' ' + state)
+    #logging.warning(code + ' ' + state)
     logging.warning(error)
     #content = request.get_json()
     #print(content)
