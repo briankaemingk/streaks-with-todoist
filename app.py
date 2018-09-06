@@ -9,6 +9,7 @@ logger.setLevel(logging.INFO)
 @app.route('/')
 def index():
     url = 'https://todoist.com/oauth/authorize?state=' + os.getenv('STATE') + '&client_id=' + os.getenv('CLIENT_ID') + '&scope=data:read_write'
+    print(url)
     return 'Todoist-Morph: Click <a href=' + url + '>here</a> to connect your account.'
 
 @app.route('/callback')
@@ -24,11 +25,11 @@ def callback():
     print(r)
 
     # extracting response text
-    #pastebin_url = r.text
-    #print("The pastebin URL is:%s" % pastebin_url)
+    pastebin_url = r.text
+    print("The pastebin URL is:%s" % pastebin_url)
 
-    content = r.get_json()
-    print(content)
+    #content = r.get_json()
+    #print(content)
     return 'Complete'
 
 
