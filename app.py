@@ -6,6 +6,10 @@ app = Flask(__name__)
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
+@app.route('/')
+def index():
+    url = 'https://todoist.com/oauth/authorize?state=' + os.getenv('STATE') + '&client_id=' + os.getenv('CLIENT_ID') + '&scope=data:read_write'
+    return 'Todoist-Morph: Click <a href=' + url + '>here</a> to connect your account.'
 
 @app.route('/callback')
 def callback():
