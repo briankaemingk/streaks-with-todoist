@@ -1,5 +1,5 @@
 from flask import Flask, request
-import logging
+import logging, os
 
 app = Flask(__name__)
 
@@ -11,9 +11,9 @@ logger.setLevel(logging.INFO)
 def callback():
     code = request.args.get('code')
     state = request.args.get('state')
-    error = request.args.get('error')
-    #logging.warning(code + ' ' + state)
-    logging.warning(error)
+    if state != os.getenv('STATE') or request.args.get('error'):
+        logging.warning('Request for Todoist-Morph not authorized, exiting')
+        exit()
     #content = request.get_json()
     #print(content)
     return 'Complete'
