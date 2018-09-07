@@ -34,9 +34,8 @@ def callback():
 @app.route('/webhook', methods=['POST'])
 def webhook():
     event_id = request.headers.get('X-Todoist-Delivery-ID')
-    return jsonify({'status': 'accepted', 'request_id': event_id}), 200
-    #content = request.get_json()
-    #print(content)
+    content = request.get_json()
+    print(content)
     return jsonify({'status': 'accepted', 'request_id': event_id}), 200
 
 if __name__ == '__main__':
