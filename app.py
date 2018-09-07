@@ -1,5 +1,5 @@
 from todoist.api import TodoistAPI
-from flask import Flask, request
+from flask import Flask, request, jsonify
 import logging, os, requests
 
 app = Flask(__name__)
@@ -10,7 +10,6 @@ logger.setLevel(logging.INFO)
 @app.route('/')
 def index():
     url = 'https://todoist.com/oauth/authorize?state=' + os.getenv('STATE') + '&client_id=' + os.getenv('CLIENT_ID') + '&scope=data:read_write'
-    print(url)
     return 'Todoist-Morph: Click <a href=' + url + '>here</a> to connect your account.'
 
 @app.route('/callback')
@@ -27,13 +26,18 @@ def callback():
     # extracting response text
     content = r.json()
     access_token = content['access_token']
-    print(access_token)
     api = TodoistAPI(access_token)
     api.sync()
-    print(api.state['items'])
-
     return 'Complete'
 
+
+@app.route('/webhook', methods=['POST'])
+def webhook():
+    event_id = request.headers.get('X-Todoist-Delivery-ID')
+    return jsonify({'status': 'accepted', 'request_id': event_id}), 200
+    #content = request.get_json()
+    #print(content)
+    return jsonify({'status': 'accepted', 'request_id': event_id}), 200
 
 if __name__ == '__main__':
     app.run()
