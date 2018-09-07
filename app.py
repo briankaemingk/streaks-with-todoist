@@ -39,6 +39,7 @@ def webhook_callback():
 
         if request_hmac == calculated_hmac:
             if request.json['event_data']['content'] == "Test":
+                print("TRUE")
                 return jsonify({'status': 'accepted', 'request_id': event_id}), 200
         else:
             return jsonify({'status': 'rejected',
