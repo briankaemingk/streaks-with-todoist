@@ -1,6 +1,7 @@
 from todoist.api import TodoistAPI
 from flask import Flask, request, jsonify
-import os, requests, string, random, hmac, base64, hashlib
+import os, requests, string, random, hmac, base64, hashlib, logging
+import task_complete
 
 app = Flask(__name__)
 
@@ -38,8 +39,12 @@ def webhook_callback():
             hmac.new(bytes(os.getenv('CLIENT_SECRET'), encoding='utf-8'), msg=request.get_data(), digestmod=hashlib.sha256).digest()).decode("utf-8")
 
         if request_hmac == calculated_hmac:
-            if request.json['event_data']['content'] == "Test":
-                print("TRUE")
+            if request.json['event_name'] == 'item:completed':
+                task_id = request.json['event_data']['id']
+                api = initiate_api()
+                task = api.items.get_by_id(int(task_id))
+                task_complete.main(task)
+                api.commit()
                 return jsonify({'status': 'accepted', 'request_id': event_id}), 200
         else:
             return jsonify({'status': 'rejected',
@@ -63,6 +68,17 @@ def initialize_token(code):
 def get_token():
     token = os.getenv('TODOIST_APIKEY')
     return token
+
+# Initiate and sync Todoist API
+def initiate_api():
+    TODOIST_APIKEY = get_token()
+    if not TODOIST_APIKEY:
+        logging.warning('Please set the API token in environment variable.')
+        exit()
+    api = TodoistAPI(TODOIST_APIKEY)
+    api.sync()
+    return api
+
 
 
 if __name__ == '__main__':
