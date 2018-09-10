@@ -1,7 +1,9 @@
+from todoist.api import TodoistAPI
 import re
 
 # If a task is a habit, increase the streak by +1
-def main(task):
+def main(api, task_id):
+    task = api.items.get_by_id(task_id)
     content = task['content']
     if is_habit(content):
         habit = is_habit(content)

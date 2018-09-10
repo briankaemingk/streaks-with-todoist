@@ -5,6 +5,7 @@ import task_complete
 
 app = Flask(__name__)
 
+# Index page initiates a user's token
 @app.route('/')
 def index():
     # Generate 6 random digits
@@ -12,6 +13,8 @@ def index():
     url = 'https://todoist.com/oauth/authorize?state=' + os.getenv('STATE') + '&client_id=' + os.getenv('CLIENT_ID') + '&scope=data:read_write'
     return 'Todoist-Morph: Click <a href=' + url + '>here</a> to connect your account.'
 
+
+# Callback set on the management console authorizes a user
 @app.route('/oauth_callback')
 def oauth_callback():
     code = request.args.get('code')
@@ -22,38 +25,22 @@ def oauth_callback():
     return 'Complete'
 
 
+# Routes webhooks to various actions
 @app.route('/webhook_callback', methods=['POST'])
 def webhook_callback():
     event_id = request.headers.get('X-Todoist-Delivery-ID')
-
-    # Check if user-agent matches to todoist webhooks
-    if request.headers.get('USER-AGENT') == 'Todoist-Webhooks':
-
-        if not request.json:
-            return jsonify({'status': 'rejected',
-                            'reason': 'malformed request'}), 400
-
-        # Take payload and compute hmac
-        request_hmac = request.headers.get('X-Todoist-Hmac-SHA256')
-        calculated_hmac = base64.b64encode(
-            hmac.new(bytes(os.getenv('CLIENT_SECRET'), encoding='utf-8'), msg=request.get_data(), digestmod=hashlib.sha256).digest()).decode("utf-8")
-
-        if request_hmac == calculated_hmac:
-            if request.json['event_name'] == 'item:completed':
-                task_id = request.json['event_data']['id']
-                api = initiate_api()
-                task = api.items.get_by_id(int(task_id))
-                task_complete.main(task)
-                api.commit()
-                return jsonify({'status': 'accepted', 'request_id': event_id}), 200
-        else:
-            return jsonify({'status': 'rejected',
-                            'reason': 'invalid request'}), 400
+    if compute_hmac(event_id):
+        api = initiate_api()
+        if request.json['event_name'] == 'item:completed':
+            task_complete.main(api, int(request.json['event_data']['id']))
+        api.commit()
+        return jsonify({'status': 'accepted', 'request_id': event_id}), 200
     else:
-        return jsonify({'status': 'rejected'}), 400
-    return jsonify({'status': 'accepted', 'request_id': event_id}), 200
+        return jsonify({'status': 'rejected',
+                        'reason': 'malformed request'}), 400
 
 
+# Gets the authorization code from the oauth callback and routes it to get the access token
 def initialize_token(code):
     data = {'client_id' : os.getenv('CLIENT_ID'), 'client_secret' : os.getenv('CLIENT_SECRET'), 'code' : code}
     # sending post request and saving response as response object
@@ -79,6 +66,14 @@ def initiate_api():
     api.sync()
     return api
 
+
+# Take payload and compute hmac--check if user-agent matches to todoist webhooks
+def compute_hmac(event_id):
+    if request.headers.get('USER-AGENT') == 'Todoist-Webhooks':
+        request_hmac = request.headers.get('X-Todoist-Hmac-SHA256')
+        calculated_hmac = base64.b64encode(hmac.new(bytes(os.getenv('CLIENT_SECRET'), encoding='utf-8'), msg=request.get_data(), digestmod=hashlib.sha256).digest()).decode("utf-8")
+        if request_hmac == calculated_hmac: return 1
+        else: return 0
 
 
 if __name__ == '__main__':
