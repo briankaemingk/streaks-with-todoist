@@ -2,6 +2,10 @@ from todoist.api import TodoistAPI
 from flask import Flask, request, jsonify
 from apscheduler.schedulers.background import BackgroundScheduler
 import os, requests, string, random, hmac, base64, hashlib, logging, atexit, pytz, daily, task_complete, re
+import pytz
+import reminder_fired
+from dateutil.parser import parse
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
 
@@ -35,6 +39,8 @@ def webhook_callback():
         api = initiate_api()
         if request.json['event_name'] == 'item:completed':
             task_complete.main(api, int(request.json['event_data']['id']))
+        if request.json['event_name'] == 'reminder:fired':
+            reminder_fired.main(api, int(request.json['event_data']['item_id']))
         api.commit()
         return jsonify({'status': 'accepted', 'request_id': event_id}), 200
     else:
@@ -55,9 +61,8 @@ def initialize_token(code):
 
 # Create scheduled job to run after app token is initialized
 def initialize_cron_job(api):
-    user_timezone = pytz.timezone(api.state["user"]["tz_info"]["timezone"])
-    scheduler = BackgroundScheduler(timezone=user_timezone)
-    scheduler.add_job(daily.main, 'cron', args=[api, user_timezone], hour=0, minute=0)
+    scheduler = BackgroundScheduler(timezone=get_user_timezone(api))
+    scheduler.add_job(daily.main, 'cron', args=[api, get_user_timezone(api)], hour=0, minute=0)
     scheduler.start()
     atexit.register(lambda: scheduler.shutdown())
 
@@ -98,6 +103,31 @@ def update_streak(task, streak):
     new_content = re.sub(r'\[streak\s(\d+)\]', streak_num, task['content'])
     print(new_content)
     task.update(content=new_content)
+
+
+# Update due date to end of today (default for all day tasks)
+def update_to_all_day(now):
+    new_due_date = datetime(year=now.year,
+                            month=now.month,
+                            day=now.day,
+                            hour=23,
+                            minute=59,
+                            second=59).astimezone(pytz.utc)
+    return new_due_date
+
+# Parse time string, convert to datetime object in user's timezone
+def convert_time_str_datetime(time_str, user_timezone):
+    return parse(time_str).astimezone(user_timezone)
+
+# Get user's timezone
+def get_user_timezone(api):
+    return pytz.timezone(api.state["user"]["tz_info"]["timezone"])
+
+
+# Get current time in user's timezone
+def get_now_user_timezone(api):
+    user_timezone = get_user_timezone(api)
+    return datetime.now(tz=user_timezone)
 
 
 if __name__ == '__main__':
