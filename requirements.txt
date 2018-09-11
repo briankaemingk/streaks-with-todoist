@@ -1,3 +1,4 @@
+APScheduler==3.5.3
 certifi==2018.8.24
 chardet==3.0.4
 click==6.7
@@ -11,9 +12,14 @@ jsonify==0.5
 MarkupSafe==1.0
 post==1.0.2
 public==1.0.3
+python-dateutil==2.7.3
 python-dotenv==0.9.1
+pytz==2018.5
 query-string==1.0.2
 requests==2.19.1
+six==1.11.0
+timedelta==0.0.1
 todoist-python==7.0.18
+tzlocal==1.5.1
 urllib3==1.23
 Werkzeug==0.14.1

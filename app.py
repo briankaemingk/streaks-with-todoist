@@ -1,7 +1,7 @@
 from todoist.api import TodoistAPI
 from flask import Flask, request, jsonify
-import os, requests, string, random, hmac, base64, hashlib, logging
-import task_complete
+from apscheduler.schedulers.background import BackgroundScheduler
+import os, requests, string, random, hmac, base64, hashlib, logging, atexit, pytz, daily, task_complete, re
 
 app = Flask(__name__)
 
@@ -22,6 +22,8 @@ def oauth_callback():
     if state != os.getenv('STATE') or request.args.get('error'):
         return 'Request for Todoist-Morph not authorized, exiting. Go <a href=' + "/" + '>back</a>'
     initialize_token(code)
+    api = initiate_api()
+    initialize_cron_job(api)
     return 'Complete'
 
 
@@ -51,6 +53,15 @@ def initialize_token(code):
     os.environ["TODOIST_APIKEY"] = access_token
 
 
+# Create scheduled job to run after app token is initialized
+def initialize_cron_job(api):
+    user_timezone = pytz.timezone(api.state["user"]["tz_info"]["timezone"])
+    scheduler = BackgroundScheduler(timezone=user_timezone)
+    scheduler.add_job(daily.main, 'cron', args=[api, user_timezone], hour=0, minute=0)
+    scheduler.start()
+    atexit.register(lambda: scheduler.shutdown())
+
+
 # Get user's Todoist API Key
 def get_token():
     token = os.getenv('TODOIST_APIKEY')
@@ -74,6 +85,19 @@ def compute_hmac(event_id):
         calculated_hmac = base64.b64encode(hmac.new(bytes(os.getenv('CLIENT_SECRET'), encoding='utf-8'), msg=request.get_data(), digestmod=hashlib.sha256).digest()).decode("utf-8")
         if request_hmac == calculated_hmac: return 1
         else: return 0
+
+
+# Determine if text has content text[streak n]
+def is_habit(text):
+    return re.search(r'\[streak\s(\d+)\]', text)
+
+
+# Update streak contents from text [streak n] to text [streak n+1]
+def update_streak(task, streak):
+    streak_num = '[streak {}]'.format(streak)
+    new_content = re.sub(r'\[streak\s(\d+)\]', streak_num, task['content'])
+    print(new_content)
+    task.update(content=new_content)
 
 
 if __name__ == '__main__':
