@@ -4,6 +4,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import os, requests, string, random, hmac, base64, hashlib, logging, atexit, pytz, daily, task_complete, re
 import pytz
 import reminder_fired
+import task_updated
 from dateutil.parser import parse
 from datetime import datetime, timedelta
 
@@ -41,6 +42,8 @@ def webhook_callback():
             task_complete.main(api, int(request.json['event_data']['id']))
         if request.json['event_name'] == 'reminder:fired':
             reminder_fired.main(api, int(request.json['event_data']['item_id']))
+        if request.json['event_name'] == 'item:updated':
+            task_updated.main(api)
         api.commit()
         return jsonify({'status': 'accepted', 'request_id': event_id}), 200
     else:
@@ -56,9 +59,11 @@ def initialize_token(code):
     # extracting response text
     content = r.json()
     access_token = content['access_token']
+    #TODO: Change this from environment variable to database
     os.environ["TODOIST_APIKEY"] = access_token
 
 
+# TODO: Test the reset streak in prod on server
 # Create scheduled job to run after app token is initialized
 def initialize_cron_job(api):
     scheduler = BackgroundScheduler(timezone=get_user_timezone(api))
@@ -117,7 +122,9 @@ def update_to_all_day(now):
 
 # Parse time string, convert to datetime object in user's timezone
 def convert_time_str_datetime(time_str, user_timezone):
-    return parse(time_str).astimezone(user_timezone)
+    try:
+        return parse(time_str).astimezone(user_timezone)
+    except ValueError: return None
 
 # Get user's timezone
 def get_user_timezone(api):
