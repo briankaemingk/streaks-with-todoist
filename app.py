@@ -106,7 +106,6 @@ def is_habit(text):
 def update_streak(task, streak):
     streak_num = '[streak {}]'.format(streak)
     new_content = re.sub(r'\[streak\s(\d+)\]', streak_num, task['content'])
-    print(new_content)
     task.update(content=new_content)
 
 
