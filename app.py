@@ -17,7 +17,7 @@ def index():
     # Generate 6 random digits
     os.environ['STATE'] = (''.join(random.choices(string.ascii_uppercase + string.digits, k=6)))
     url = 'https://todoist.com/oauth/authorize?state=' + os.getenv('STATE') + '&client_id=' + os.getenv('CLIENT_ID') + '&scope=data:read_write'
-    return 'Todoist-Morph: Click <a href=' + url + '>here</a> to connect your account.'
+    return 'Streaks with Todoist: Click <a href=' + url + '>here</a> to connect your account.'
 
 
 # Callback set on the management console authorizes a user
