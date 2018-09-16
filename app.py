@@ -44,7 +44,7 @@ def webhook_callback():
         if request.json['event_name'] == 'reminder:fired':
             reminder_fired.main(api, int(request.json['event_data']['item_id']))
         if request.json['event_name'] == 'item:updated':
-            task_updated.main(api)
+            task_updated.main(api, int(request.json['event_data']['id']))
         api.commit()
         return jsonify({'status': 'accepted', 'request_id': event_id}), 200
     else:
@@ -135,6 +135,11 @@ def get_user_timezone(api):
 def get_now_user_timezone(api):
     user_timezone = get_user_timezone(api)
     return datetime.now(tz=user_timezone)
+
+
+# Convert a datetime object into the todoist due date string format
+def convert_datetime_str(date):
+    return date.strftime('%Y-%m-%dT%H:%M:%S')
 
 
 if __name__ == '__main__':

@@ -42,7 +42,7 @@ def check_activity_log(api, task):
     # Otherwise if there is more than one completion
     elif len(completed_logs) > 1:
         last_complete_date = app.convert_time_str_datetime(completed_logs[-1]['event_date'], app.pytz.utc)
-        last_completed_date_str = convert_datetime_str(last_complete_date)
+        last_completed_date_str = app.convert_datetime_str(last_complete_date)
         # Get all changes to this task since the last completion time
         update_logs = api.activity.get(object_type='item', event_type='updated', object_id=task['id'], since=last_completed_date_str, limit=100)
         date_update_logs = [update_log for update_log in update_logs if 'last_due_date' in update_log['extra_data']]
@@ -53,6 +53,4 @@ def check_activity_log(api, task):
                 task.close()
 
 
-# Convert a datetime object into the todoist due date string format
-def convert_datetime_str(date):
-    return date.strftime('%Y-%m-%dT%H:%M:%S')
+
