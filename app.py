@@ -26,7 +26,7 @@ def oauth_callback():
     code = request.args.get('code')
     state = request.args.get('state')
     if state != os.getenv('STATE') or request.args.get('error'):
-        return 'Request for Todoist-Morph not authorized, exiting. Go <a href=' + "/" + '>back</a>'
+        return 'Request for Streaks with Todoist not authorized, exiting. Go <a href=' + "/" + '>back</a>'
     initialize_token(code)
     api = initiate_api()
     initialize_cron_job(api)
