@@ -36,8 +36,9 @@ def check_activity_log(api, task):
         # If there was a modification to a date
         if(date_update_logs):
             # Get the last due date in the regular cycle
-            last_regular_due_date = date_update_logs[-1]['extra_data']['last_due_date']
-            if app.datetime.now(tz=app.pytz.utc) < app.convert_time_str_datetime(last_regular_due_date, app.pytz.utc):
+            last_regular_due_date_str = date_update_logs[-1]['extra_data']['last_due_date']
+            last_regular_due_date = app.convert_time_str_datetime(last_regular_due_date_str, app.pytz.utc)
+            if app.datetime.now(tz=app.get_now_user_timezone(api)).date() < last_regular_due_date.date():
                 task.close()
     # Otherwise if there is more than one completion
     elif len(completed_logs) > 1:
@@ -48,9 +49,11 @@ def check_activity_log(api, task):
         date_update_logs = [update_log for update_log in update_logs if 'last_due_date' in update_log['extra_data']]
         if(date_update_logs):
             # Get the last due date in the regular cycle
-            last_regular_due_date = date_update_logs[-1]['extra_data']['last_due_date']
-            if app.datetime.now(tz=app.pytz.utc) < app.convert_time_str_datetime(last_regular_due_date, app.pytz.utc):
+            last_regular_due_date_str = date_update_logs[-1]['extra_data']['last_due_date']
+            last_regular_due_date = app.convert_time_str_datetime(last_regular_due_date_str, app.get_now_user_timezone(api))
+            if app.datetime.now(tz=app.get_now_user_timezone(api)).date() < last_regular_due_date.date():
                 task.close()
 
-
-
+# Check if the task is due today
+def check_if_due_today(date, api):
+    if date.date() == app.get_now_user_timezone(api): return 1
