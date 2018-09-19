@@ -28,16 +28,19 @@ def index():
 # Callback set on the management console authorizes a user
 @app.route('/oauth_callback')
 def oauth_callback():
-    code = request.args.get('code')
-    state = request.args.get('state')
-    if state and code:
-        if state != state:
-            return 'Request for Streaks with Todoist not authorized, exiting. Go <a href=' + "/" + '>back</a>'
-        initialize_token(code)
-        api = initiate_api()
-        initialize_cron_job(api)
-        return 'Complete'
-    else: return 'Request for Streaks with Todoist not authorized, exiting. Go <a href=' + "/" + '>back</a>'
+    if not os.getenv('TODOIST_APIKEY'):
+        code = request.args.get('code')
+        state = request.args.get('state')
+        if state and code:
+            if state != state:
+                return 'Request for Streaks with Todoist not authorized, exiting. Go <a href=' + "/" + '>back</a>'
+            initialize_token(code)
+            api = initiate_api()
+            initialize_cron_job(api)
+            return 'Complete'
+        else: return 'Request for Streaks with Todoist not authorized, exiting. Go <a href=' + "/" + '>back</a>'
+    else: return 'Streaks with Todoist already authorized, thanks for using it!'
+
 
 # Routes webhooks to various actions
 @app.route('/webhook_callback', methods=['POST'])
