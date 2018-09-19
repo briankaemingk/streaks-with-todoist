@@ -8,13 +8,10 @@ import task_updated
 from dateutil.parser import parse
 from datetime import datetime
 
-
+app = Flask(__name__)
 # Generate 6 random digits
 state = (''.join(random.choices(string.ascii_uppercase + string.digits, k=6)))
-url = 'https://todoist.com/oauth/authorize?state=' + os.getenv('STATE') + '&client_id=' + os.getenv(
-    'CLIENT_ID') + '&scope=data:read_write'
-app = Flask(__name__)
-
+url = 'https://todoist.com/oauth/authorize?state=' + os.getenv('STATE') + '&client_id=' + os.getenv('CLIENT_ID') + '&scope=data:read_write'
 
 # Index page initiates a user's token
 @app.route('/')
