@@ -13,6 +13,7 @@ app = Flask(__name__)
 # Index page initiates a user's token
 @app.route('/')
 def index():
+    # If the environment variable has not been set, initialize it
     if not os.getenv('TODOIST_APIKEY'):
         # Generate 6 random digits
         os.environ['STATE'] = (''.join(random.choices(string.ascii_uppercase + string.digits, k=6)))
@@ -26,13 +27,14 @@ def index():
 def oauth_callback():
     code = request.args.get('code')
     state = request.args.get('state')
-    if state != os.getenv('STATE') or request.args.get('error'):
-        return 'Request for Streaks with Todoist not authorized, exiting. Go <a href=' + "/" + '>back</a>, code: ' + code + '/ state: ' + state + '/ error: ' + request.args.get('error')
-    initialize_token(code)
-    api = initiate_api()
-    initialize_cron_job(api)
-    return 'Complete'
-
+    if state and code:
+        if state != os.getenv('STATE'):
+            return 'Request for Streaks with Todoist not authorized, exiting. Go <a href=' + "/" + '>back</a>'
+        initialize_token(code)
+        api = initiate_api()
+        initialize_cron_job(api)
+        return 'Complete'
+    else: return 'Request for Streaks with Todoist not authorized, exiting. Go <a href=' + "/" + '>back</a>'
 
 # Routes webhooks to various actions
 @app.route('/webhook_callback', methods=['POST'])
