@@ -31,7 +31,7 @@ def oauth_callback():
     code = request.args.get('code')
     state = request.args.get('state')
     if state and code:
-        if state != os.getenv('STATE'):
+        if state != state:
             return 'Request for Streaks with Todoist not authorized, exiting. Go <a href=' + "/" + '>back</a>'
         initialize_token(code)
         api = initiate_api()
