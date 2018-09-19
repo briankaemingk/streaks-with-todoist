@@ -13,10 +13,12 @@ app = Flask(__name__)
 # Index page initiates a user's token
 @app.route('/')
 def index():
-    # Generate 6 random digits
-    os.environ['STATE'] = (''.join(random.choices(string.ascii_uppercase + string.digits, k=6)))
-    url = 'https://todoist.com/oauth/authorize?state=' + os.getenv('STATE') + '&client_id=' + os.getenv('CLIENT_ID') + '&scope=data:read_write'
-    return 'Streaks with Todoist: Click <a href=' + url + '>here</a> to connect your account.'
+    if not os.getenv('TODOIST_APIKEY'):
+        # Generate 6 random digits
+        os.environ['STATE'] = (''.join(random.choices(string.ascii_uppercase + string.digits, k=6)))
+        url = 'https://todoist.com/oauth/authorize?state=' + os.getenv('STATE') + '&client_id=' + os.getenv('CLIENT_ID') + '&scope=data:read_write'
+        return 'Streaks with Todoist: Click <a href=' + url + '>here</a> to connect your account.'
+    else: return 'Streaks with Todoist already authorized, thanks for using it!'
 
 
 # Callback set on the management console authorizes a user
