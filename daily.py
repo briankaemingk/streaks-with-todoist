@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 
 # Identify overdue streaks, reset the streak, and schedule them for all day
 def main(api, user_timezone):
+    print('Timer on main called')
     now = app.get_now_user_timezone(api)
     tasks = api.state['items']
     for task in tasks:

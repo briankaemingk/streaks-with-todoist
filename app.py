@@ -7,7 +7,6 @@ import reminder_fired
 import task_updated
 from dateutil.parser import parse
 from datetime import datetime
-import time
 
 app = Flask(__name__)
 
@@ -26,7 +25,7 @@ def oauth_callback():
     code = request.args.get('code')
     state = request.args.get('state')
     if state != os.getenv('STATE') or request.args.get('error'):
-        return 'Request for Streaks with Todoist not authorized, exiting. Go <a href=' + "/" + '>back</a>'
+        return 'Request for Streaks with Todoist not authorized, exiting. Go <a href=' + "/" + '>back</a>, code: ' + code + '/ state: ' + state + '/ error: ' + request.args.get('error')
     initialize_token(code)
     api = initiate_api()
     initialize_cron_job(api)
@@ -68,7 +67,7 @@ def initialize_token(code):
 # Create scheduled job to run after app token is initialized
 def initialize_cron_job(api):
     scheduler = BackgroundScheduler(timezone=get_user_timezone(api))
-    scheduler.add_job(daily.main, 'cron', args=[api, get_user_timezone(api)], hour=0, minute=0)
+    scheduler.add_job(daily.main, 'cron', args=[api, get_user_timezone(api)], hour=15, minute=48)
     scheduler.start()
     atexit.register(lambda: scheduler.shutdown())
 
