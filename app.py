@@ -19,6 +19,9 @@ app = Flask(__name__)
 # Index page initiates a user's token
 @app.route('/')
 def index():
+    # TODO: Remove these statements/initializations after implemented database
+    api = initiate_api()
+    initialize_cron_job(api)
     # If the environment variable has not been set, initialize it
     if not os.getenv('TODOIST_APIKEY'):
         return 'Streaks with Todoist: Click <a href=' + url + '>here</a> to connect your account.'
