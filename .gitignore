@@ -102,3 +102,7 @@ ENV/
 
 # pycharm
 /.idea
+
+# database
+*.pyc
+.DS_Store
