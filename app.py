@@ -54,6 +54,7 @@ def webhook_callback():
         if request.json['event_name'] == 'item:completed':
             task_complete.main(api, int(request.json['event_data']['id']))
         if request.json['event_name'] == 'reminder:fired':
+            print('Reminder fired')
             reminder_fired.main(api, int(request.json['event_data']['item_id']))
         if request.json['event_name'] == 'item:updated':
             task_updated.main(api, int(request.json['event_data']['id']))
