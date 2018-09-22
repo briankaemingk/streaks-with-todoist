@@ -17,7 +17,8 @@ def increment_streak(task):
 
 # Check if it is a recurring task: if not able to parse date string into a date, then it is a recurring task
 def check_recurring_task(api, task):
-    if not(app.convert_time_str_datetime(task['date_string'], app.get_user_timezone(api))): return 1
+    if(task['date_string']):
+        if not(app.convert_time_str_datetime(task['date_string'], app.get_user_timezone(api))): return 1
 
 
 # If a recurring task that repeats at regular intervals from the original task date is completed, it will not have an '!'
