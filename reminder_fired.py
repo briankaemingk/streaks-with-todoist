@@ -2,7 +2,7 @@ import app
 
 def main(api, task_id):
     now_date_user_time = app.get_now_user_timezone(api)
-    print('Reminder - Now user time: ' + now_date_user_time)
+    print('Reminder - Now user time: ', str(now_date_user_time))
     task = api.items.get_by_id(task_id)
     print('Reminder - Task: ', task)
     now_date = app.datetime.utcnow()
