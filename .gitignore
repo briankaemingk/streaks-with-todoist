@@ -106,3 +106,4 @@ ENV/
 # database
 *.pyc
 .DS_Store
+*.db
