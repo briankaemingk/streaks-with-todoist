@@ -2,7 +2,7 @@ import app, time
 from datetime import timedelta
 
 def main(api, task_id):
-    task = api.items.get_by_id(task_id)
+    task = api.items.get_by_id(int(task_id))
     if check_recurring_task(api, task) and check_regular_intervals(task['date_string']): check_activity_log(api, task)
     increment_streak(task)
 
@@ -39,7 +39,7 @@ def check_activity_log(api, task):
             # Get the last due date in the regular cycle
             last_regular_due_date_str = date_update_logs[-1]['extra_data']['last_due_date']
             last_regular_due_date = app.convert_time_str_datetime(last_regular_due_date_str, app.pytz.utc)
-            if app.datetime.now(tz=app.get_now_user_timezone(api)).date() < last_regular_due_date.date():
+            if app.datetime.now(tz=app.get_user_timezone(api)).date() < last_regular_due_date.date():
                 task.close()
     # Otherwise if there is more than one completion
     elif len(completed_logs) > 1:
