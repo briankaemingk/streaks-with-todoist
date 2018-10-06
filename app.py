@@ -7,14 +7,23 @@ import reminder_fired
 import task_updated
 from dateutil.parser import parse
 from datetime import datetime
-
+from flask import Flask, request
+from flask_sqlalchemy import SQLAlchemy
+import click
 
 # Generate 6 random digits
 state = (''.join(random.choices(string.ascii_uppercase + string.digits, k=6)))
 url = 'https://todoist.com/oauth/authorize?state=' + state + '&client_id=' + os.getenv('CLIENT_ID') + '&scope=data:read_write'
 app = Flask(__name__)
 
+DATABASE_URL = os.getenv('DATABASE_URL', "postgresql://localhost/hello_world")
+app.config.from_mapping(
+        SQLALCHEMY_DATABASE_URI = DATABASE_URL,
+        SQLALCHEMY_TRACK_MODIFICATIONS = False
+        )
+db = SQLAlchemy(app)
 
+from models import *
 
 # Index page initiates a user's token
 @app.route('/')
@@ -64,6 +73,34 @@ def webhook_callback():
         return jsonify({'status': 'rejected',
                         'reason': 'malformed request'}), 400
 
+### END POINTS FOR DB TESTING
+@app.route('/createuser')
+def createuser():
+    name = request.args.get('name', None)
+    token = request.args.get('access_token', None)
+    u = User(name, token)
+    db.session.add(u)
+    db.session.commit()
+    return 'user {} created'.format(name)
+
+@app.route('/listusers')
+def listusers():
+    user_list = User.query.order_by(User.id).all()
+    if user_list:
+        return_string = 'All users: '
+        for u in user_list:
+            return_string += '{}, {}, {};'.format(u.id, u.name, u.access_token)
+    else:
+        return_string = 'No Users in Database'
+
+    return return_string
+
+# Drop required tables in exist, and create new ones
+@app.cli.command()
+def initdb():
+    db.drop_all()
+    db.create_all()
+    click.echo("database initialized")
 
 # Gets the authorization code from the oauth callback and routes it to get the access token
 def initialize_token(code):
