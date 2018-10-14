@@ -1,5 +1,5 @@
 from todoist.api import TodoistAPI
-from flask import Flask, request, jsonify
+from flask import jsonify
 from apscheduler.schedulers.background import BackgroundScheduler
 import os, requests, string, random, hmac, base64, hashlib, logging, atexit, pytz, daily, task_complete, re
 import pytz
@@ -9,7 +9,6 @@ from dateutil.parser import parse
 from datetime import datetime
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
-import click, config
 
 # Generate 6 random digits
 state = (''.join(random.choices(string.ascii_uppercase + string.digits, k=6)))
@@ -18,11 +17,6 @@ url = 'https://todoist.com/oauth/authorize?state=' + state + '&client_id=' + os.
 app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-#DATABASE_URL = os.getenv('DATABASE_URL', "postgresql:///hello_world")
-# app.config.from_mapping(
-#         SQLALCHEMY_DATABASE_URI = DATABASE_URL,
-#         SQLALCHEMY_TRACK_MODIFICATIONS = False
-#         )
 db = SQLAlchemy(app)
 
 from models import User
@@ -97,12 +91,6 @@ def listusers():
 
     return return_string
 
-# Drop required tables in exist, and create new ones
-@app.cli.command()
-def initdb():
-    db.drop_all()
-    #db.create_all()
-    click.echo("database initialized")
 
 # Gets the authorization code from the oauth callback and routes it to get the access token
 def initialize_token(code):
