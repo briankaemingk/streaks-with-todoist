@@ -25,7 +25,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 #         )
 db = SQLAlchemy(app)
 
-from models import *
+from models import User
 
 # Index page initiates a user's token
 @app.route('/')
@@ -101,7 +101,7 @@ def listusers():
 @app.cli.command()
 def initdb():
     db.drop_all()
-    db.create_all()
+    #db.create_all()
     click.echo("database initialized")
 
 # Gets the authorization code from the oauth callback and routes it to get the access token
