@@ -9,18 +9,20 @@ from dateutil.parser import parse
 from datetime import datetime
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
-import click
+import click, config
 
 # Generate 6 random digits
 state = (''.join(random.choices(string.ascii_uppercase + string.digits, k=6)))
 url = 'https://todoist.com/oauth/authorize?state=' + state + '&client_id=' + os.getenv('CLIENT_ID') + '&scope=data:read_write'
-app = Flask(__name__)
 
-DATABASE_URL = os.getenv('DATABASE_URL', "postgresql:///hello_world")
-app.config.from_mapping(
-        SQLALCHEMY_DATABASE_URI = DATABASE_URL,
-        SQLALCHEMY_TRACK_MODIFICATIONS = False
-        )
+app = Flask(__name__)
+app.config.from_object(os.environ['APP_SETTINGS'])
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+#DATABASE_URL = os.getenv('DATABASE_URL', "postgresql:///hello_world")
+# app.config.from_mapping(
+#         SQLALCHEMY_DATABASE_URI = DATABASE_URL,
+#         SQLALCHEMY_TRACK_MODIFICATIONS = False
+#         )
 db = SQLAlchemy(app)
 
 from models import *
