@@ -39,9 +39,14 @@ def oauth_callback():
         access_token = initialize_token(code)
         api = initiate_api(access_token)
         user_id = api.state['user']['id']
-        #exists = db.session.query(User.id).filter_by(name='davidism').scalar() is not None
-        initialize_cron_job(api)
-        return 'Complete'
+        user_exists = db.session.query(User.id).filter_by(id=user_id).scalar() is not None
+        if not user_exists:
+            u = User(user_id, access_token)
+            db.session.add(u)
+            db.session.commit()
+            initialize_cron_job(api)
+            return 'Complete'
+        else: return 'Streaks with Todoist already authorized. Go <a href=' + "/" + '>back</a>'
     else: return 'Request for Streaks with Todoist not authorized, exiting. Go <a href=' + "/" + '>back</a>'
 
 
@@ -50,17 +55,24 @@ def oauth_callback():
 @app.route('/webhook_callback', methods=['POST'])
 def webhook_callback():
     event_id = request.headers.get('X-Todoist-Delivery-ID')
-    if compute_hmac(event_id):
-        api = initiate_api()
-        if request.json['event_name'] == 'item:completed':
-            task_complete.main(api, int(request.json['event_data']['id']))
-        if request.json['event_name'] == 'reminder:fired':
-            print('Reminder fired')
-            reminder_fired.main(api, int(request.json['event_data']['item_id']))
-        if request.json['event_name'] == 'item:updated':
-            task_updated.main(api, int(request.json['event_data']['id']))
-        api.commit()
-        return jsonify({'status': 'accepted', 'request_id': event_id}), 200
+    if event_id is not None and compute_hmac():
+        user_id = request.json['user_id']
+        user_exists = db.session.query(User.id).filter_by(id=user_id).scalar() is not None
+        if user_exists:
+            user = User.query.get(user_id)
+            api = initiate_api(user.access_token)
+            if request.json['event_name'] == 'item:completed':
+                task_complete.main(api, int(request.json['event_data']['id']))
+            if request.json['event_name'] == 'reminder:fired':
+                print('Reminder fired')
+                reminder_fired.main(api, int(request.json['event_data']['item_id']))
+            if request.json['event_name'] == 'item:updated':
+                task_updated.main(api, int(request.json['event_data']['id']))
+            api.commit()
+            return jsonify({'status': 'accepted', 'request_id': event_id}), 200
+        else:
+            return jsonify({'status': 'rejected',
+                            'reason': 'malformed request'}), 400
     else:
         return jsonify({'status': 'rejected',
                         'reason': 'malformed request'}), 400
@@ -116,7 +128,7 @@ def initiate_api(access_token):
 
 
 # Take payload and compute hmac--check if user-agent matches to todoist webhooks
-def compute_hmac(event_id):
+def compute_hmac():
     if request.headers.get('USER-AGENT') == 'Todoist-Webhooks':
         request_hmac = request.headers.get('X-Todoist-Hmac-SHA256')
         calculated_hmac = base64.b64encode(hmac.new(bytes(os.getenv('CLIENT_SECRET'), encoding='utf-8'), msg=request.get_data(), digestmod=hashlib.sha256).digest()).decode("utf-8")
