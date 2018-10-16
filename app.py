@@ -1,3 +1,4 @@
+import settings
 from todoist.api import TodoistAPI
 from flask import jsonify
 from apscheduler.schedulers.background import BackgroundScheduler
@@ -24,30 +25,25 @@ from models import User
 # Index page initiates a user's token
 @app.route('/')
 def index():
-    # TODO: Remove these statements/initializations after implemented database
-    api = initiate_api()
-    initialize_cron_job(api)
-    # If the environment variable has not been set, initialize it
-    if not os.getenv('TODOIST_APIKEY'):
-        return 'Streaks with Todoist: Click <a href=' + url + '>here</a> to connect your account.'
-    else: return 'Streaks with Todoist already authorized, thanks for using it!'
+    return 'Streaks with Todoist: Click <a href=' + url + '>here</a> to connect your account.'
 
 
 # Callback set on the management console authorizes a user
 @app.route('/oauth_callback')
 def oauth_callback():
-    if not os.getenv('TODOIST_APIKEY'):
-        code = request.args.get('code')
-        state = request.args.get('state')
-        if state and code:
-            if state != state:
-                return 'Request for Streaks with Todoist not authorized, exiting. Go <a href=' + "/" + '>back</a>'
-            initialize_token(code)
-            api = initiate_api()
-            initialize_cron_job(api)
-            return 'Complete'
-        else: return 'Request for Streaks with Todoist not authorized, exiting. Go <a href=' + "/" + '>back</a>'
-    else: return 'Streaks with Todoist already authorized, thanks for using it!'
+    code = request.args.get('code')
+    state = request.args.get('state')
+    if state and code:
+        if state != state:
+            return 'Request for Streaks with Todoist not authorized, exiting. Go <a href=' + "/" + '>back</a>'
+        access_token = initialize_token(code)
+        api = initiate_api(access_token)
+        user_id = api.state['user']['id']
+        #exists = db.session.query(User.id).filter_by(name='davidism').scalar() is not None
+        initialize_cron_job(api)
+        return 'Complete'
+    else: return 'Request for Streaks with Todoist not authorized, exiting. Go <a href=' + "/" + '>back</a>'
+
 
 
 # Routes webhooks to various actions
@@ -72,12 +68,12 @@ def webhook_callback():
 ### END POINTS FOR DB TESTING
 @app.route('/createuser')
 def createuser():
-    name = request.args.get('name', None)
+    id = request.args.get('id', None)
     token = request.args.get('access_token', None)
-    u = User(name, token)
+    u = User(id, token)
     db.session.add(u)
     db.session.commit()
-    return 'user {} created'.format(name)
+    return 'user {} created'.format(id)
 
 @app.route('/listusers')
 def listusers():
@@ -85,7 +81,7 @@ def listusers():
     if user_list:
         return_string = 'All users: '
         for u in user_list:
-            return_string += '{}, {}, {};'.format(u.id, u.name, u.access_token)
+            return_string += '{}, {};'.format(u.id, u.access_token)
     else:
         return_string = 'No Users in Database'
 
@@ -100,8 +96,7 @@ def initialize_token(code):
     # extracting response text
     content = r.json()
     access_token = content['access_token']
-    #TODO: Change this from environment variable to database
-    os.environ["TODOIST_APIKEY"] = access_token
+    return access_token
 
 
 # TODO: Test the reset streak in prod on server
@@ -113,18 +108,9 @@ def initialize_cron_job(api):
     atexit.register(lambda: scheduler.shutdown())
 
 
-# Get user's Todoist API Key
-def get_token():
-    token = os.getenv('TODOIST_APIKEY')
-    return token
-
 # Initiate and sync Todoist API
-def initiate_api():
-    TODOIST_APIKEY = get_token()
-    if not TODOIST_APIKEY:
-        logging.warning('Please set the API token in environment variable.')
-        exit()
-    api = TodoistAPI(TODOIST_APIKEY)
+def initiate_api(access_token):
+    api = TodoistAPI(access_token)
     api.sync()
     return api
 
@@ -165,6 +151,7 @@ def convert_time_str_datetime(time_str, user_timezone):
     try:
         return parse(time_str).astimezone(user_timezone)
     except ValueError: return None
+
 
 # Get user's timezone
 def get_user_timezone(api):
