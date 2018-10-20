@@ -3,7 +3,8 @@ from datetime import timedelta
 
 def main(api, task_id):
     task = api.items.get_by_id(int(task_id))
-    if check_recurring_task(api, task) and check_regular_intervals(task['date_string']): check_activity_log(api, task)
+    if (api.state['user']['is_premium']):
+        if check_recurring_task(api, task) and check_regular_intervals(task['date_string']): check_activity_log(api, task)
     increment_streak(task)
 
 
