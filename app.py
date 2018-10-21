@@ -46,9 +46,12 @@ def oauth_callback():
             db.session.commit()
             initialize_cron_job(api)
             return 'Complete'
-        else: return 'Streaks with Todoist already authorized. Go <a href=' + "/" + '>back</a>'
+        else:
+            u = User.query.filter_by(id=user_id).first()
+            u.access_token = access_token
+            db.session.commit()
+            return 'Streaks with Todoist already authorized. Go <a href=' + "/" + '>back</a>'
     else: return 'Request for Streaks with Todoist not authorized, exiting. Go <a href=' + "/" + '>back</a>'
-
 
 
 # Routes webhooks to various actions
