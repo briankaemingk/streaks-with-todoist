@@ -50,7 +50,7 @@ def oauth_callback():
             u = User.query.filter_by(id=user_id).first()
             u.access_token = access_token
             db.session.commit()
-            return 'Streaks with Todoist already authorized. Go <a href=' + "/" + '>back</a>'
+            return 'Streaks with Todoist re-authorized.'
     else: return 'Request for Streaks with Todoist not authorized, exiting. Go <a href=' + "/" + '>back</a>'
 
 
