@@ -170,7 +170,7 @@ def convert_time_str_datetime(time_str, user_timezone):
 
 # Get user's timezone
 def get_user_timezone(api):
-    todoist_tz = timezone(api.state["user"]["tz_info"]["timezone"])
+    todoist_tz = api.state["user"]["tz_info"]["timezone"]
     match = re.search("GMT( (\+|\-\d+))?", todoist_tz)
 
     if match:
