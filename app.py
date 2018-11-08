@@ -114,7 +114,6 @@ def initialize_token(code):
     return access_token
 
 
-# TODO: Test the reset streak in prod on server
 # Create scheduled job to run after app token is initialized
 def initialize_cron_job(api):
     scheduler = BackgroundScheduler(timezone=get_user_timezone(api))
