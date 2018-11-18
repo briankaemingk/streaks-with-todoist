@@ -8,4 +8,4 @@ def main(api, task_id):
         comment = re.findall('\{.*\}', content)[0]
     content_no_comment = content.replace(comment, '')
     task.update(content=content_no_comment)
-    api.notes.add(task_id, comment) 
+    api.notes.add(task_id, comment[1:-1]) 
