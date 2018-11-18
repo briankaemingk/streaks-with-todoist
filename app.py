@@ -6,6 +6,7 @@ import os, requests, string, random, hmac, base64, hashlib, logging, atexit, pyt
 import pytz
 import reminder_fired
 import task_updated
+import task_added
 from dateutil.parser import parse
 from datetime import datetime
 from flask import Flask, request
@@ -71,6 +72,8 @@ def webhook_callback():
                 reminder_fired.main(api, int(request.json['event_data']['item_id']))
             if request.json['event_name'] == 'item:updated':
                 task_updated.main(api, int(request.json['event_data']['id']))
+            if request.json['event_name'] == 'item:added':
+                task_added.main(api, int(request.json['event_data']['id']))
             api.commit()
             return jsonify({'status': 'accepted', 'request_id': event_id}), 200
         else:
