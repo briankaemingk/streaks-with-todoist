@@ -26,7 +26,7 @@ from models import User
 # Index page initiates a user's token
 @app.route('/')
 def index():
-    return 'Streaks with Todoist: Click <a href=' + url + '>here</a> to connect your account.<br><br> Visit our <a href=https://github.com/briankaemingk/streaks-with-todoist>Github page</a> for more info or to submit a bug.'
+    return 'Streaks with Todoist: Click <a href=' + url + '>here</a> to connect your account.<br><br>Visit our <a href=https://github.com/briankaemingk/streaks-with-todoist>Github page</a> for more info or to submit a bug.'
 
 
 # Callback set on the management console authorizes a user
