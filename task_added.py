@@ -2,7 +2,7 @@ import re
 
 
 def main(api, task_id):
-    if (api.state['user']['is_premium']):
+    if api.state['user']['is_premium']:
         task = api.items.get_by_id(int(task_id))
         content = task['content']
         if '{' in content and '}' in content:
