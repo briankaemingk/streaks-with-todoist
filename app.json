@@ -1,0 +1,6 @@
+{
+  "name": "streaks-with-todoist",
+  "description": "Enhancements to native behavior in todoist to improve motivation, focus, and flow.",
+  "repository": "https://github.com/briankaemingk/streaks",
+  "keywords": ["todoist", "flask", "ifttt"]
+}
