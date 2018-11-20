@@ -1,6 +1,10 @@
 # Streaks with Todoist 
 Enhancements to native behavior in todoist to improve motivation, focus, and flow.
 
+## Installation
+
+Visit [SwT homepage](https://streaks-with-todoist.herokuapp.com) to enable this integration.
+
 ## Improve Focus
 
 ### Just-In-Time Tasking
@@ -52,9 +56,7 @@ This is a different flavor of the originally implemented [habitist](https://gith
 
 4. If you fail to complete the task and it becomes overdue, the script will schedule it to today and reset `[streak X]` to `[streak 0]`.
 
-## Installation
 
-Visit [SwT homepage](https://streaks-with-todoist.herokuapp.com) to enable this integration.
 
 ## License
 
