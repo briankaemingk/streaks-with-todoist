@@ -165,18 +165,23 @@ def update_to_all_day(now):
 
 # Parse time string, convert to datetime object in user's timezone
 def convert_time_str_datetime(time_str, user_timezone):
-    try:
-        return parse(time_str).astimezone(user_timezone)
-    except ValueError: return None
 
+    try:
+        # In format Fri 23 Nov 2018 18:00:00 +0000
+        datetime_obj = datetime.strptime(time_str, '%a %d %b %Y %H:%M:%S %z')
+    except ValueError or TypeError: return None
+    dt_local = datetime_obj.astimezone(user_timezone)
+    return dt_local
 
 # Get user's timezone
 def get_user_timezone(api):
     todoist_tz = api.state["user"]["tz_info"]["timezone"]
-    match = re.search("GMT( (\+|\-\d+))?", todoist_tz)
+    match = re.search("GMT( ((\+|\-)(\d+)))?", todoist_tz)
 
     if match:
-        GMT_tz = 'Etc/GMT' + match.group(2)
+        if match.group(3) == '+': operation = '-'
+        else: operation = '+'
+        GMT_tz = 'Etc/GMT' + operation + match.group(4)
         return pytz.timezone(GMT_tz)
 
     else: return pytz.timezone(api.state["user"]["tz_info"]["timezone"])

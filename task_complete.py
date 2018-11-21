@@ -52,8 +52,8 @@ def check_activity_log(api, task):
         if(date_update_logs):
             # Get the last due date in the regular cycle
             last_regular_due_date_str = date_update_logs[-1]['extra_data']['last_due_date']
-            last_regular_due_date = app.convert_time_str_datetime(last_regular_due_date_str, app.get_now_user_timezone(api))
-            if app.datetime.now(tz=app.get_now_user_timezone(api)).date() < last_regular_due_date.date():
+            last_regular_due_date = app.convert_time_str_datetime(last_regular_due_date_str, app.get_user_timezone(api))
+            if app.datetime.now(tz=app.get_user_timezone(api)).date() < last_regular_due_date.date():
                 task.close()
 
 # Check if the task is due today
