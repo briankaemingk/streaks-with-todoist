@@ -14,7 +14,9 @@ def increment_streak(task):
     if app.is_habit(content):
         habit = app.is_habit(content)
         streak = int(habit.group(1)) + 1
+        print("In increment streak, task is: ", content)
         app.update_streak(task, streak)
+
 
 # Check if it is a recurring task: if not able to parse date string into a date, then it is a recurring task
 def check_recurring_task(api, task):
