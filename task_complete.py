@@ -40,10 +40,11 @@ def check_activity_log(api, task):
         # If there was a modification to a date
         if(date_update_logs):
             # Get the last due date in the regular cycle
-            last_regular_due_date_str = date_update_logs[-1]['extra_data']['last_due_date']
-            last_regular_due_date = app.convert_time_str_datetime(last_regular_due_date_str, app.pytz.utc)
-            if app.datetime.now(tz=app.get_user_timezone(api)).date() < last_regular_due_date.date():
-                task.close()
+            if date_update_logs[-1]['extra_data']['last_due_date'] is not None:
+                last_regular_due_date_str = date_update_logs[-1]['extra_data']['last_due_date']
+                last_regular_due_date = app.convert_time_str_datetime(last_regular_due_date_str, app.pytz.utc)
+                if app.datetime.now(tz=app.get_user_timezone(api)).date() < last_regular_due_date.date():
+                    task.close()
     # Otherwise if there is more than one completion
     elif len(completed_logs) > 1:
         last_complete_date = app.convert_time_str_datetime(completed_logs[-1]['event_date'], app.pytz.utc)
