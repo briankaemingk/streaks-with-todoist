@@ -14,7 +14,6 @@ def increment_streak(task):
     if app.is_habit(content):
         habit = app.is_habit(content)
         streak = int(habit.group(1)) + 1
-        print("In increment streak, task is: ", content)
         app.update_streak(task, streak)
 
 
