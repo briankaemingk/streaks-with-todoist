@@ -99,6 +99,9 @@ This is a different flavor of the originally implemented [habitist](https://gith
     CLIENT_ID=...jfdk34s...
     CLIENT_SECRET=...343j...
     ```    
+6. Start a tunnel using serveo: `ssh -R stage-streaks-with-todoist:80:localhost:5000 serveo.net` 
+7. Run the app locally using `flask run`
+
 ### Staging Installation
 
 1. Create a heroku app for your staging app: `$ heroku create staging-appname`
@@ -109,6 +112,11 @@ This is a different flavor of the originally implemented [habitist](https://gith
     ```
 3. In addition, set the APP_SETTINGS variable: `heroku config:set APP_SETTINGS=config.StagingConfig`
 4. Push the app: `git push heroku master`
+5. Log into the  Log into the [Todoist app console](https://developer.todoist.com/appconsole.html):
+    * Change the OAuth redirect URL to your heroku app url: https://heroku_app_name.herokuapp.com/oauth_callback
+    * Click Save Settings
+    * Scroll down to the Webhooks section and set the Webhook callback URL to your heroku app url: https://heroku_app_name.herokuapp.com/webhook_callback
+    * Click Save webhook configurations
 
 ## License
 
