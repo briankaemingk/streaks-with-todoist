@@ -117,6 +117,12 @@ This is a different flavor of the originally implemented [habitist](https://gith
     * Click Save Settings
     * Scroll down to the Webhooks section and set the Webhook callback URL to your heroku app url: https://heroku_app_name.herokuapp.com/webhook_callback
     * Click Save webhook configurations
+    
+### Database updates
+If you make any updates to the database, you need to upgrade the database in your local and staging environments like this:
+
+* Local: `$ python manage.py db upgrade`  
+* Staging: `$ heroku run python manage.py db upgrade`
 
 ## License
 
