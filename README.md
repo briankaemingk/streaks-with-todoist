@@ -7,7 +7,7 @@ Visit [SwT homepage](https://streaks-with-todoist.herokuapp.com) to enable this 
 
 ## Improve Focus
 
-### Just-In-Time Tasking
+### Just-In-Time Tasking (Premium Todoist users only)
 If you use todoist as your trusted system, then you inevitably have hundreds of tasks in your backlog at a given moment. How do you decide which of these tasks to do at a particular moment? 
 
 JIT Tasking automates backlog filtering to only reveal tasks at the precise time, location, and context when they are actionable.
