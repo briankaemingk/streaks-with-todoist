@@ -77,7 +77,6 @@ def webhook_callback():
                 content = item['content']
                 print(local_time + ': After task complete: ' + content)
             if request.json['event_name'] == 'reminder:fired':
-                print(request.json)
                 item_id = int(request.json['event_data']['item_id'])
                 task = api.items.get_by_id(item_id)
                 print(local_time + ': Reminder fired: ' + task['content'])
