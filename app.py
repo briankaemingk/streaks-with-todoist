@@ -67,25 +67,26 @@ def webhook_callback():
             api = initiate_api(user.access_token)
             task = api.items.get_by_id(int(request.json['event_data']['id']))
             local_time = str(get_now_user_timezone(api))
+            task_id = int(request.json['event_data']['id'])
             content = task['content']
             if request.json['event_name'] == 'item:completed':
                 print(local_time + ': Task complete: ' + content)
-                task_complete.main(api, int(request.json['event_data']['item_id']))
-                task = api.items.get_by_id(int(request.json['event_data']['id']))
+                task_complete.main(api, task_id)
+                task = api.items.get_by_id(task_id)
                 content = task['content']
                 print(local_time + ': After task complete: ' + content)
             if request.json['event_name'] == 'reminder:fired':
                 print(local_time + ': Reminder fired: ' + content)
-                reminder_fired.main(api, int(request.json['event_data']['item_id']))
+                reminder_fired.main(api, task_id)
             if request.json['event_name'] == 'item:updated':
                 print(local_time + ': Task updated: ' + content)
-                task_updated.main(api, int(request.json['event_data']['id']))
-                task = api.items.get_by_id(int(request.json['event_data']['id']))
+                task_updated.main(api, task_id)
+                task = api.items.get_by_id(task_id)
                 content = task['content']
                 print(local_time + ': After task updated: ' + content)
             if request.json['event_name'] == 'item:added':
                 print(local_time + ': Task added: ' + content)
-                task_added.main(api, int(request.json['event_data']['id']))
+                task_added.main(api, task_id)
             api.commit()
             return jsonify({'status': 'accepted', 'request_id': event_id}), 200
         else:
