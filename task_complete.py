@@ -19,7 +19,7 @@ def increment_streak(task):
 
 # Check if it is a recurring task: if not able to parse date string into a date, then it is a recurring task
 def check_recurring_task(api, task):
-    if task['date_string'] is not None:
+    if 'date_string' in task:
         if not(app.convert_time_str_datetime(task['date_string'], app.get_user_timezone(api))): return 1
 
 
