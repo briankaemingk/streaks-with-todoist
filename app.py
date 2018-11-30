@@ -70,6 +70,7 @@ def webhook_callback():
             content = task['content']
             if request.json['event_name'] == 'item:completed':
                 print(local_time + ': Task complete: ' + content)
+                task_complete.main(api, int(request.json['event_data']['item_id']))
                 task = api.items.get_by_id(int(request.json['event_data']['id']))
                 content = task['content']
                 print(local_time + ': After task complete: ' + content)
