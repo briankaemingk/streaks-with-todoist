@@ -66,7 +66,7 @@ def webhook_callback():
             user = User.query.get(user_id)
             api = initiate_api(user.access_token)
             task = api.items.get_by_id(int(request.json['event_data']['id']))
-            local_time = get_now_user_timezone(api)
+            local_time = str(get_now_user_timezone(api))
             content = task['content']
             if request.json['event_name'] == 'item:completed':
                 print(local_time + ': Task complete: ' + content)
