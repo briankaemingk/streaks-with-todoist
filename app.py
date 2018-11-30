@@ -65,11 +65,11 @@ def webhook_callback():
         if user_exists:
             user = User.query.get(user_id)
             api = initiate_api(user.access_token)
-            item_id = int(request.json['event_data']['id'])
-            item = api.items.get_by_id(item_id)
             local_time = str(get_now_user_timezone(api))
 
             if request.json['event_name'] == 'item:completed':
+                item_id = int(request.json['event_data']['id'])
+                item = api.items.get_by_id(item_id)
                 content = item['content']
                 print(local_time + ': Task complete: ' + content)
                 task_complete.main(api, item_id)
@@ -78,10 +78,13 @@ def webhook_callback():
                 print(local_time + ': After task complete: ' + content)
             if request.json['event_name'] == 'reminder:fired':
                 print(request.json)
-                task = api.items.get_by_id(item['item_id'])
+                item_id = int(request.json['event_data']['item_id'])
+                task = api.items.get_by_id(item_id)
                 print(local_time + ': Reminder fired: ' + task['content'])
-                reminder_fired.main(api, item['item_id'])
+                reminder_fired.main(api, item_id)
             if request.json['event_name'] == 'item:updated':
+                item_id = int(request.json['event_data']['id'])
+                item = api.items.get_by_id(item_id)
                 content = item['content']
                 print(local_time + ': Task updated: ' + content)
                 task_updated.main(api, item_id)
@@ -89,6 +92,8 @@ def webhook_callback():
                 content = item['content']
                 print(local_time + ': After task updated: ' + content)
             if request.json['event_name'] == 'item:added':
+                item_id = int(request.json['event_data']['id'])
+                item = api.items.get_by_id(item_id)
                 content = item['content']
                 print(local_time + ': Task added: ' + content)
                 task_added.main(api, item_id)
