@@ -124,6 +124,9 @@ If you make any updates to the database, you need to upgrade the database in you
 * Local: `$ python manage.py db upgrade`  
 * Staging: `$ heroku run python manage.py db upgrade`
 
+You can access the database locally with the following command: `$ sudo -u postgres psql
+`
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
