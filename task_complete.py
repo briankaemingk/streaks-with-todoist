@@ -4,7 +4,7 @@ from datetime import timedelta
 def main(api, task_id):
     task = api.items.get_by_id(int(task_id))
     if task is not None:
-        if api.state['user']['is_premium'] and task is not None:
+        if api.state['user']['is_premium'] and task['date_string'] is not None:
             if check_recurring_task(api, task) and check_regular_intervals(task['date_string']): check_activity_log(api, task)
         increment_streak(task)
 
@@ -20,8 +20,7 @@ def increment_streak(task):
 
 # Check if it is a recurring task: if not able to parse date string into a date, then it is a recurring task
 def check_recurring_task(api, task):
-    if 'date_string' in task:
-        if not(app.convert_time_str_datetime(task['date_string'], app.get_user_timezone(api))): return 1
+    if not(app.convert_time_str_datetime(task['date_string'], app.get_user_timezone(api))): return 1
 
 
 # If a recurring task that repeats at regular intervals from the original task date is completed, it will not have an '!'
