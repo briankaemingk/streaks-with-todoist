@@ -68,6 +68,8 @@ def webhook_callback():
             local_time = str(get_now_user_timezone(api))
 
             if request.json['event_name'] == 'item:completed':
+                print(request.headers)
+                print(request.json)
                 item_id = int(request.json['event_data']['id'])
                 if api.items.get_by_id(item_id) is not None:
                     item = api.items.get_by_id(item_id)
