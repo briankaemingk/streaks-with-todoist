@@ -1,6 +1,6 @@
 import settings
 from todoist.api import TodoistAPI
-from flask import jsonify
+from flask import jsonify, render_template
 from apscheduler.schedulers.background import BackgroundScheduler
 import os, requests, string, random, hmac, base64, hashlib, logging, atexit, pytz, daily, task_complete, re
 import pytz
@@ -26,7 +26,7 @@ from models import User
 # Index page initiates a user's token
 @app.route('/')
 def index():
-    return 'Streaks with Todoist: Click <a href=' + url + '>here</a> to connect your account.<br><br>Visit our <a href=https://github.com/briankaemingk/streaks-with-todoist>Github page</a> for more info or to submit a bug.'
+    return render_template('index.html', url=url)
 
 
 # Callback set on the management console authorizes a user
@@ -51,7 +51,7 @@ def oauth_callback():
             u = User.query.filter_by(id=user_id).first()
             u.access_token = access_token
             db.session.commit()
-            return 'Streaks with Todoist re-authorized.'
+            return render_template('settings.html')
     else: return 'Request for Streaks with Todoist not authorized, exiting. Go <a href=' + "/" + '>back</a>'
 
 
