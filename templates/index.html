@@ -1,0 +1,76 @@
+<html>
+    <head>
+        <title>Streaks with Todoist</title>
+    </head>
+    <body>
+    <h1><a id="Streaks_with_Todoist_0"></a>Streaks with Todoist</h1>
+
+    <p>Enhancements to native behavior in todoist to improve motivation, focus, and flow.</p>
+
+        <p>Click <a href='{{ url }}'>here</a> to connect your account or log-in. Visit our <a href=https://github.com/briankaemingk/streaks-with-todoist>Github page</a> for more info or to submit a bug.</p>
+    <h2><a id="Improve_Motivation_40"></a>Improve Motivation</h2>
+<p>An automation to enable habit tracking in todoist. It integrates Seinfield's &quot;<a href="https://lifehacker.com/281626/jerry-seinfelds-productivity-secret">Don't Break the Chain</a>&quot; method into <a href="http://todoist.com/">todoist</a>.</p>
+<p>This is a different flavor of the originally implemented <a href="https://github.com/amitness/habitist">habitist</a>. While habitist is focused on daily habits, habitist (streak) can be applied to habits of any recurrence time-frames (daily, weekly, monthly, etc).</p>
+<h2><a id="Useage_48"></a>Useage</h2>
+<ol>
+<li>
+<p>You add habits you want to form as task on todoist with a recurring schedule (could be any recurrence pattern (<code>every day</code>, <code>every week</code> or <code>every year</code>, for example)</p>
+</li>
+<li>
+<p>Add <code>[streak 0]</code> to the task</p>
+</li>
+<li>
+<p>When you complete the task, the <code>[streak 0]</code> will become <code>[streak 1]</code></p>
+</li>
+<li>
+<p>If you fail to complete the task and it becomes overdue, the script will schedule it to today and reset <code>[streak X]</code> to <code>[streak 0]</code>.</p>
+</li>
+</ol>
+
+
+
+
+<h2><a id="Improve_Focus_7"></a>Improve Focus</h2>
+<h3><a id="JustInTime_Tasking_Premium_Todoist_users_only_9"></a>Just-In-Time Tasking (Premium Todoist users only)</h3>
+<p>If you use todoist as your trusted system, then you inevitably have hundreds of tasks in your backlog at a given moment. How do you decide which of these tasks to do at a particular moment?</p>
+<p>JIT Tasking automates backlog filtering to only reveal tasks at the precise time, location, and context when they are actionable.</p>
+<h3><a id="Useage_14"></a>Useage</h3>
+<p>JIT Tasking only shows you tasks when you are able to complete them. It accomplishes this through a combination of filtering and todoist api changes that run in the background.</p>
+<ol>
+<li>
+<p>Add a task scheduled for a particular day and time that you need to complete on that day, but aren't able to do them until a certain time. For example, let's say you need to make a personal phone call, but you don't want to make the call until after your shift at work ends at 6PM. Add that task in Todoist as <code>Call dad about birthday party</code> and set the due date as <code>today 6pm</code>.</p>
+</li>
+<li>
+<p>Instead of looking at the default Today view in Todoist, look at a filter you will create called <code>Todo (Level 1)</code> which will hide this time-specific task until 6PM when you are able to do it. TODO: Automate filter creation</p>
+</li>
+<li>
+<p>When 6PM rolls around, the due date for the task will be automatically changed to all-day today, and the task will automatically appear in your <code>Todo (Level 1)</code> filter.</p>
+</li>
+</ol>
+<h3><a id="Recurrence_Task_Rescheduling_Premium_Todoist_users_only_24"></a>Recurrence Task Rescheduling (Premium Todoist users only)</h3>
+<p>Sometimes, your schedule requires you to postpone or reschedule repeating tasks. How do you properly postpone or reschedule a recurring task to a date <em>and time</em> outside of the regular recurrence?</p>
+<h3><a id="Usage_28"></a>Usage</h3>
+<p>Recurrence scheduling allows you to postpone or reschedule a recurring task to a specific date and time while keeping the task recurrence in-tact.</p>
+<ol>
+<li>
+<p>First off, if you need to only change the day of a recurrence, but not the time, you can do that with Todoist: to postpone a recurring task, use the <a href="https://support.todoist.com/hc/articles/205325931">task scheduler</a> by right-clicking (Web, Windows, macOS) or swiping left (iOS, Android) and pick a new date from there</p>
+</li>
+<li>
+<p>If you need to not only change the day of the recurrence, but also the time, first add the time you want to reschedule the task to in the task as <code>&lt;12:00&gt;</code> or just <code>&lt;&gt;</code> if you want to change it to an all-day task</p>
+</li>
+<li>
+<p>Next, assuming you want to change the date as well, use the <a href="https://support.todoist.com/hc/articles/205325931">task scheduler</a> by right-clicking (Web, Windows, macOS) or swiping left (iOS, Android) and pick a new date from there</p>
+</li>
+<li>
+<p>Todoist will move the task to the particular day you re-schedule it to and in the background, todoist-morph re-schedules your task to your desired time then removes the inputted time from the task description</p>
+</li>
+</ol>
+    <h2><a id="Improve_Flow_58"></a>Improve Flow</h2>
+<p>Lets you add comments to a task in one-line.</p>
+<h2><a id="Usage_62"></a>Usage</h2>
+<ol>
+<li>Add a <code>Test task {with stuff you want in the comments here}</code></li>
+<li>Wait a few seconds for the magic to happen in the backgorund and the content between <code>{}</code> will be removed from the task body and placed into a comment.</li>
+</ol>
+    </body>
+</html>
