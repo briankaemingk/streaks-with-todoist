@@ -42,7 +42,7 @@ def oauth_callback():
         user_id = api.state['user']['id']
         user_exists = db.session.query(User.id).filter_by(id=user_id).scalar() is not None
         if not user_exists:
-            u = User(user_id, access_token)
+            u = User(user_id, access_token, True, True, True, True)
             db.session.add(u)
             db.session.commit()
             initialize_cron_job(api)
