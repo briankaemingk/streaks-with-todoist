@@ -42,7 +42,11 @@ def oauth_callback():
         user_id = api.state['user']['id']
         user_exists = db.session.query(User.id).filter_by(id=user_id).scalar() is not None
         if not user_exists:
-            u = User(user_id, access_token, True, True, True, True)
+            if api.state['user']['is_premium']:
+                u = User(user_id, access_token, jit_feature=True, recurrence_resch_feature=True, streaks_feature=True, in_line_comment_feature=True)
+            else:
+                u = User(user_id, access_token, jit_feature=False, recurrence_resch_feature=False, streaks_feature=True,
+                         in_line_comment_feature=False)
             db.session.add(u)
             db.session.commit()
             initialize_cron_job(api)
@@ -51,7 +55,8 @@ def oauth_callback():
             u = User.query.filter_by(id=user_id).first()
             u.access_token = access_token
             db.session.commit()
-            return render_template('settings.html')
+            settings_list = [['Streaks', u.streaks_feature], ['Just In Time tasks', u.jit_feature], ['Recurrence reschedule', u.recurrence_resch_feature], ['In-line comment', u.in_line_comment_feature]]
+            return render_template('settings.html', settings_list=settings_list)
     else: return 'Request for Streaks with Todoist not authorized, exiting. Go <a href=' + "/" + '>back</a>'
 
 
