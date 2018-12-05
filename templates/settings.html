@@ -1,0 +1,10 @@
+<h1 class="title">SwT Settings</h1>
+
+    {% if settings_list %}
+        <table class="table is-striped is-fullwidth">
+            {% for setting in settings_list %}
+                <tr>
+                <td>{{ setting[0] }}:</td><td>{% if setting[1] %} Enabled{%  endif %}</td>
+                </tr>
+        {% endfor %}
+    {% endif %}
