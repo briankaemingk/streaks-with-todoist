@@ -72,6 +72,13 @@ If you make any updates to the database, you need to upgrade the database in you
 
 * Local: `$ python manage.py db upgrade`  
 * Staging: `$ heroku run python manage.py db upgrade`
+* Re-creating the database:
+
+```
+>>> from app import db
+>>> db.create_all()
+>>> db.session.commit()
+```
 
 You can access the database locally with the following command: `$ sudo -u postgres psql
 `
