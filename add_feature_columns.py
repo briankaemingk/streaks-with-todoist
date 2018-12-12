@@ -4,12 +4,10 @@ import os
 from app import initiate_api
 from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
+from app import app, db
 
-app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
-db = SQLAlchemy(app)
 
 from models import User
 
