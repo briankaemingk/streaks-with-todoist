@@ -72,6 +72,7 @@ If you make any updates to the database, you need to upgrade the database in you
 
 * Local: `$ python manage.py db upgrade`  
 * Staging: `$ heroku run python manage.py db upgrade`
+    * Running a command: `heroku pg:psql -c "command"`
 * Re-creating the database:
 
 ```
