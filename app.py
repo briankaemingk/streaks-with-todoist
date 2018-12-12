@@ -50,7 +50,8 @@ def oauth_callback():
             db.session.add(u)
             db.session.commit()
             initialize_cron_job(api)
-            return 'Complete'
+            settings_list = [['Streaks', u.streaks_feature], ['Just In Time tasks', u.jit_feature], ['Recurrence reschedule', u.recurrence_resch_feature], ['In-line comment', u.in_line_comment_feature]]
+            return render_template('settings.html', settings_list=settings_list)
         else:
             u = User.query.filter_by(id=user_id).first()
             u.access_token = access_token

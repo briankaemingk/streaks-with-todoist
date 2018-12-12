@@ -4,7 +4,7 @@
         <table class="table is-striped is-fullwidth">
             {% for setting in settings_list %}
                 <tr>
-                <td>{{ setting[0] }}:</td><td>{% if setting[1] %} Enabled{%  endif %}</td>
+                <td>{{ setting[0] }}:</td><td>{% if setting[1] %} Enabled {% else %} Disabled {%  endif %}</td>
                 </tr>
         {% endfor %}
     {% endif %}
