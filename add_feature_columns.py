@@ -24,9 +24,10 @@ for user in user_list:
         user.recurrence_resch_feature = True
         user.jit_feature = True
         user.in_line_comment_feature = True
+        db.session.commit()
     else:
         user.recurrence_resch_feature = False
         user.jit_feature = False
         user.in_line_comment_feature = False
+        db.session.commit()
 
-    db.session.commit()
