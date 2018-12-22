@@ -1,15 +1,11 @@
-import settings
-from todoist.api import TodoistAPI
 import os
-from app import initiate_api
-from flask_sqlalchemy import SQLAlchemy
-from flask import Flask
-from app import app, db
+from app.utils import initiate_api
+from app.app import app, db
 
 app.config.from_object(os.environ['APP_SETTINGS'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-from models import User
+from app.user.models import User
 
 
 user_list = User.query.order_by(User.id).all()
