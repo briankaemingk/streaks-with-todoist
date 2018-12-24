@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, jsonify
-from app.utils import initialize_token, initiate_api, create_url, initialize_cron_job, process_webhook
+from app.todoist_webhook import initiate_api, compute_hmac, create_url, initialize_token, initialize_cron_job
 from app.extensions import db
+from worker import conn
 
 blueprint = Blueprint('public', __name__, static_folder='../static')
 
@@ -50,6 +51,13 @@ def oauth_callback():
 def webhook_callback():
     event_id = request.headers.get('X-Todoist-Delivery-ID')
     req = request.json
-    #q.enqueue(process_webhook, event_id, req)
-    process_webhook(event_id, req)
-    return jsonify({'status': 'accepted', 'request_id': event_id}), 200
+    if event_id is not None and compute_hmac():
+        user_id = req['user_id']
+        user_exists = db.session.query(User.id).filter_by(id=user_id).scalar() is not None
+        if(user_exists):
+            current_user = User.query.get(user_id)
+            current_user.launch_task('process_webhooks', 'Processing webhook', req)
+        return jsonify({'status': 'accepted', 'request_id': event_id}), 200
+    else:
+        return jsonify({'status': 'rejected',
+                            'reason': 'malformed request'}), 400

@@ -1,4 +1,7 @@
 from app.extensions import db
+from flask import current_app
+import redis
+import rq
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -20,3 +23,11 @@ class User(db.Model):
 
     def __repr__(self):
         return '<id {}, access token {}>'.format(self.id, self.access_token)
+
+    def launch_task(self, name, description, *args, **kwargs):
+        current_app.task_queue.enqueue('app.tasks.' + name, self.id, *args, **kwargs)
+
+
+
+
+
