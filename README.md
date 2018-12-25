@@ -9,7 +9,7 @@ Visit [SwT homepage](https://streaks-with-todoist.herokuapp.com) to enable this 
 
 ### Pre-requisites
 
-1. Install [PostgreSQL locally]
+1. Install PostgreSQL locally
 ```
 sudo apt update
 sudo apt install postgresql postgresql-contrib
