@@ -1,3 +1,8 @@
+<html><head>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+</head>
+
+<body>
 <h1 class="title">SwT Settings</h1>
 
     {% if settings_list %}
@@ -10,3 +15,5 @@
     {% endif %}
 
 <p>Go <a href='/'>back</a></p>
+</body>
+</html>
