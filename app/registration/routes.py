@@ -1,20 +1,13 @@
-from flask import Blueprint, render_template, request, jsonify
-from app.todoist_webhook import initiate_api, compute_hmac, create_url, initialize_token, initialize_cron_job
+import atexit
+import os
+import requests
+from apscheduler.schedulers.background import BackgroundScheduler
+from flask import Blueprint, render_template, request
+from app.todoist_webhook import initiate_api, get_user_timezone, daily
 from app.extensions import db
-from worker import conn
-
-blueprint = Blueprint('public', __name__, static_folder='../static')
-
-
-# Index page initiates a user's token
-@blueprint.route('/')
-def index():
-    url = create_url()
-    return render_template('index.html', url=url)
-
-
 from app.user.models import User
 
+blueprint = Blueprint('registration', __name__, static_folder='../static')
 
 @blueprint.route('/oauth_callback')
 def oauth_callback():
@@ -46,18 +39,21 @@ def oauth_callback():
             return render_template('settings.html', settings_list=settings_list)
     else: return 'Request for Streaks with Todoist not authorized, exiting. Go <a href=' + "/" + '>back</a>'
 
-# Routes webhooks to various actions
-@blueprint.route('/webhook_callback', methods=['POST'])
-def webhook_callback():
-    event_id = request.headers.get('X-Todoist-Delivery-ID')
-    req = request.json
-    if event_id is not None and compute_hmac():
-        user_id = req['user_id']
-        user_exists = db.session.query(User.id).filter_by(id=user_id).scalar() is not None
-        if(user_exists):
-            current_user = User.query.get(user_id)
-            current_user.launch_task('process_webhooks', 'Processing webhook', req)
-        return jsonify({'status': 'accepted', 'request_id': event_id}), 200
-    else:
-        return jsonify({'status': 'rejected',
-                            'reason': 'malformed request'}), 400
+
+def initialize_token(code):
+    """Gets the authorization code from the oauth callback and routes it to get the access token"""
+    data = {'client_id' : os.getenv('CLIENT_ID'), 'client_secret' : os.getenv('CLIENT_SECRET'), 'code' : code}
+    # sending post request and saving response as response object
+    r = requests.post(url='https://todoist.com/oauth/access_token?', data=data)
+    # extracting response text
+    content = r.json()
+    access_token = content['access_token']
+    return access_token
+
+
+def initialize_cron_job(api):
+    """Create scheduled job to run after app token is initialized"""
+    scheduler = BackgroundScheduler(timezone=get_user_timezone(api))
+    scheduler.add_job(daily, 'cron', args=[api, get_user_timezone(api)], hour=0, minute=0)
+    scheduler.start()
+    atexit.register(lambda: scheduler.shutdown())

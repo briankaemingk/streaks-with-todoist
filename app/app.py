@@ -1,5 +1,5 @@
 from flask import Flask
-from app import public, user
+from app import public, user, registration
 from app.config import Config
 from app.extensions import db, migrate
 from redis import Redis
@@ -24,7 +24,8 @@ def register_extensions(app):
 
 def register_blueprints(app):
     """Register Flask blueprints."""
-    app.register_blueprint(public.views.blueprint)
+    app.register_blueprint(public.routes.blueprint)
+    app.register_blueprint(registration.routes.blueprint)
     return None
 
 

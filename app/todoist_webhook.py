@@ -1,4 +1,3 @@
-import atexit
 import base64
 import hashlib
 import hmac
@@ -8,8 +7,6 @@ import re
 import string
 from datetime import datetime, timedelta
 import pytz
-import requests
-from apscheduler.schedulers.background import BackgroundScheduler
 from flask import request
 from todoist import TodoistAPI
 
@@ -130,25 +127,6 @@ def create_url():
     state = (''.join(random.choices(string.ascii_uppercase + string.digits, k=6)))
     url = 'https://todoist.com/oauth/authorize?state=' + state + '&client_id=' + os.getenv('CLIENT_ID') + '&scope=data:read_write'
     return url
-
-
-def initialize_token(code):
-    """Gets the authorization code from the oauth callback and routes it to get the access token"""
-    data = {'client_id' : os.getenv('CLIENT_ID'), 'client_secret' : os.getenv('CLIENT_SECRET'), 'code' : code}
-    # sending post request and saving response as response object
-    r = requests.post(url='https://todoist.com/oauth/access_token?', data=data)
-    # extracting response text
-    content = r.json()
-    access_token = content['access_token']
-    return access_token
-
-
-def initialize_cron_job(api):
-    """Create scheduled job to run after app token is initialized"""
-    scheduler = BackgroundScheduler(timezone=get_user_timezone(api))
-    scheduler.add_job(daily, 'cron', args=[api, get_user_timezone(api)], hour=0, minute=0)
-    scheduler.start()
-    atexit.register(lambda: scheduler.shutdown())
 
 
 def task_updated(api, task_id):
