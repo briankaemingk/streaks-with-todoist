@@ -42,7 +42,7 @@ sudo apt install postgresql postgresql-contrib
     $ flask db migrate
     $ flask db upgrade 
     ```
-5. Create an empty file called `.env` and copy and paste the example from the file `.env.example`, changing the CLIENT_ID and CLIENT_SECRET:
+5. Create an empty file called `.env` and copy and paste the example from the file `.env-example`, changing the CLIENT_ID and CLIENT_SECRET:
     * Log into the [Todoist app console](https://developer.todoist.com/appconsole.html) to add the client id and client secret:
     ```
     CLIENT_ID=...jfdk34s...
