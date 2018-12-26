@@ -2,12 +2,12 @@ import atexit
 import os
 import requests
 from apscheduler.schedulers.background import BackgroundScheduler
-from flask import Blueprint, render_template, request
-from app.todoist_webhook import initiate_api, get_user_timezone, daily
+from flask import Blueprint, render_template, request, session, redirect, url_for
+from app.webhooks.todoist_webhook import initiate_api, get_user_timezone, daily
 from app.extensions import db
 from app.user.models import User
 
-blueprint = Blueprint('registration', __name__, static_folder='../static')
+blueprint = Blueprint('auth', __name__, static_folder='../static')
 
 @blueprint.route('/oauth_callback')
 def oauth_callback():
@@ -29,14 +29,16 @@ def oauth_callback():
             db.session.add(u)
             db.session.commit()
             initialize_cron_job(api)
-            settings_list = [['Streaks', u.streaks_feature], ['Just In Time tasks', u.jit_feature], ['Recurrence reschedule', u.recurrence_resch_feature], ['In-line comment', u.in_line_comment_feature]]
-            return render_template('settings.html', settings_list=settings_list)
+            settings_list = create_settings_list(u)
+            session['settings_list'] = settings_list
+            return redirect(url_for('user.settings'))
         else:
             u = User.query.filter_by(id=user_id).first()
             u.access_token = access_token
             db.session.commit()
-            settings_list = [['Streaks', u.streaks_feature], ['Just In Time tasks', u.jit_feature], ['Recurrence reschedule', u.recurrence_resch_feature], ['In-line comment', u.in_line_comment_feature]]
-            return render_template('settings.html', settings_list=settings_list)
+            settings_list = create_settings_list(u)
+            session['settings_list'] = settings_list
+            return redirect(url_for('user.settings'))
     else: return 'Request for Streaks with Todoist not authorized, exiting. Go <a href=' + "/" + '>back</a>'
 
 
@@ -57,3 +59,10 @@ def initialize_cron_job(api):
     scheduler.add_job(daily, 'cron', args=[api, get_user_timezone(api)], hour=0, minute=0)
     scheduler.start()
     atexit.register(lambda: scheduler.shutdown())
+
+
+def create_settings_list(user):
+    settings_list = [['Streaks', user.streaks_feature], ['Just In Time tasks', user.jit_feature],
+                     ['Recurrence reschedule', user.recurrence_resch_feature],
+                     ['In-line comment', user.in_line_comment_feature]]
+    return settings_list

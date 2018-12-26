@@ -1,7 +1,5 @@
 from app.extensions import db
 from flask import current_app
-import redis
-import rq
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -22,7 +20,8 @@ class User(db.Model):
         self.in_line_comment_feature = in_line_comment_feature
 
     def __repr__(self):
-        return '<id {}, access token {}>'.format(self.id, self.access_token)
+        return '<id {}, access token {}, jit feature {}, recurrence resch feature {}, streaks feature {}, in-line comment feature {}>'.\
+            format(self.id, self.access_token, self.jit_feature, self.recurrence_resch_feature, self.streaks_feature, self.in_line_comment_feature)
 
     def launch_task(self, name, description, *args, **kwargs):
         current_app.task_queue.enqueue('app.tasks.' + name, self.id, *args, **kwargs)

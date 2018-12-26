@@ -191,6 +191,14 @@ def check_activity_log(api, task):
     """Look back through the activity log to see if the current time is before the original due date. If so, skip the next occurence."""
     # Find last 2 completed objects in activity log, including this one
     completed_logs = api.activity.get(object_type='item', event_type='completed', object_id=task['id'], limit=2)
+
+    # Catch timeout error
+    i = 1
+    while completed_logs == '<html><head><title>Timeout</title></head><body><h1>Timeout</h1></body></html>':
+        print("Completed logs TIMEOUT error, retry #", i)
+        i += 1
+        completed_logs = api.activity.get(object_type='item', event_type='completed', object_id=task['id'], limit=2)
+
     # If there's only one record of completion (the one that caused this webhook to fire)
     if len(completed_logs) == 1:
         update_logs = api.activity.get(object_type='item', event_type='updated', object_id=task['id'], limit=100)

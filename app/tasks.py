@@ -1,7 +1,7 @@
 import sys
 from app.app import create_app
 from app.user.models import User
-from app.todoist_webhook import process_webhook
+from app.webhooks.todoist_webhook import process_webhook
 
 app = create_app()
 app.app_context().push()
