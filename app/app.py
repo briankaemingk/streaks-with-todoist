@@ -13,7 +13,7 @@ def print_date_time():
     print('Timer run')
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=print_date_time, trigger="interval", seconds=3)
+scheduler.add_job(func=print_date_time, trigger="cron", minute=25)
 scheduler.start()
 
 # Shut down the scheduler when exiting the app
