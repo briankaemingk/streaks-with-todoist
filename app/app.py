@@ -13,7 +13,7 @@ def print_date_time():
     print('Timer run')
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=print_date_time, trigger="cron", minute=25)
+scheduler.add_job(func=print_date_time, trigger="cron", minute=0)
 scheduler.start()
 
 # Shut down the scheduler when exiting the app
@@ -28,14 +28,6 @@ def create_app(config_class=Config):
     register_extensions(app)
     register_shellcontext(app)
     register_blueprints(app)
-
-    # scheduler = BackgroundScheduler()
-    # scheduler.add_job(func=print_date_time, trigger="cron", minute=22)
-    # scheduler.start()
-    #
-    # # Shut down the scheduler when exiting the app
-    # atexit.register(lambda: scheduler.shutdown())
-
     return app
 
 
