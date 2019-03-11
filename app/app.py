@@ -4,6 +4,21 @@ from app.config import Config
 from app.extensions import db, migrate
 from redis import Redis
 import rq
+import atexit
+
+from apscheduler.schedulers.background import BackgroundScheduler
+
+
+def print_date_time():
+    print('Timer run')
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=print_date_time, trigger="interval", seconds=3)
+scheduler.start()
+
+# Shut down the scheduler when exiting the app
+atexit.register(lambda: scheduler.shutdown())
+
 
 def create_app(config_class=Config):
     app = Flask(__name__.split('.')[0])
@@ -13,6 +28,14 @@ def create_app(config_class=Config):
     register_extensions(app)
     register_shellcontext(app)
     register_blueprints(app)
+
+    scheduler = BackgroundScheduler()
+    scheduler.add_job(func=print_date_time, trigger="interval", seconds=3)
+    scheduler.start()
+
+    # Shut down the scheduler when exiting the app
+    atexit.register(lambda: scheduler.shutdown())
+
     return app
 
 
