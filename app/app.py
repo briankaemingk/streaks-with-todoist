@@ -29,12 +29,12 @@ def create_app(config_class=Config):
     register_shellcontext(app)
     register_blueprints(app)
 
-    scheduler = BackgroundScheduler()
-    scheduler.add_job(func=print_date_time, trigger="cron", minute=18)
-    scheduler.start()
-
-    # Shut down the scheduler when exiting the app
-    atexit.register(lambda: scheduler.shutdown())
+    # scheduler = BackgroundScheduler()
+    # scheduler.add_job(func=print_date_time, trigger="cron", minute=22)
+    # scheduler.start()
+    #
+    # # Shut down the scheduler when exiting the app
+    # atexit.register(lambda: scheduler.shutdown())
 
     return app
 
