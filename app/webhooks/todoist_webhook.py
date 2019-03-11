@@ -251,7 +251,7 @@ def reminder_fired(api, task_id):
     task.update(due_date_utc=now_string_all_day)
 
 
-def daily(api, user_timezone):
+def daily():
     """Identify overdue streaks, reset the streak, and schedule them for all day"""
     print('Timer on main called')
     # now = get_now_user_timezone(api)
