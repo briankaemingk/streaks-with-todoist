@@ -1,15 +1,17 @@
 """Create an application instance."""
 from app.app import create_app
-from apscheduler.schedulers.blocking import BlockingScheduler
+from apscheduler.schedulers.background import BackgroundScheduler
+import atexit
 
 app = create_app()
 app.app_context().push()
 
-sched = BlockingScheduler()
+def print_date_time():
+    print('Timer run')
 
-@sched.scheduled_job('cron', minute=49)
-def scheduled_job():
-    print("Timer called")
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=print_date_time, trigger="interval", seconds=3)
+scheduler.start()
 
-
-sched.start()
+# Shut down the scheduler when exiting the app
+atexit.register(lambda: scheduler.shutdown())
