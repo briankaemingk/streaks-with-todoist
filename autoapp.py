@@ -3,9 +3,6 @@ from app.app import create_app
 from apscheduler.schedulers.background import BackgroundScheduler
 import atexit
 
-app = create_app()
-app.app_context().push()
-
 def print_date_time():
     print('Timer run')
 
@@ -15,3 +12,8 @@ scheduler.start()
 
 # Shut down the scheduler when exiting the app
 atexit.register(lambda: scheduler.shutdown())
+
+
+app = create_app()
+app.app_context().push()
+
