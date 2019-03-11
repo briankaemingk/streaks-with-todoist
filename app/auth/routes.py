@@ -28,7 +28,6 @@ def oauth_callback():
                          in_line_comment_feature=False)
             db.session.add(u)
             db.session.commit()
-            initialize_cron_job(api)
             settings_list = create_settings_list(u)
             session['settings_list'] = settings_list
             return redirect(url_for('user.settings'))
@@ -53,10 +52,10 @@ def initialize_token(code):
     return access_token
 
 
-def initialize_cron_job(api):
+def initialize_cron_job():
     """Create scheduled job to run after app token is initialized"""
-    scheduler = BackgroundScheduler(timezone=get_user_timezone(api))
-    scheduler.add_job(daily, 'cron', args=[api, get_user_timezone(api)], hour=0, minute=0)
+    scheduler = BackgroundScheduler(timezone=get_user_timezone())
+    scheduler.add_job(daily, 'cron', hour=0, minute=0)
     scheduler.start()
     atexit.register(lambda: scheduler.shutdown())
 
