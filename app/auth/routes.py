@@ -55,7 +55,7 @@ def initialize_token(code):
 def initialize_cron_job():
     """Create scheduled job to run after app token is initialized"""
     scheduler = BackgroundScheduler(timezone=get_user_timezone())
-    scheduler.add_job(daily, 'cron', hour=0, minute=0)
+    scheduler.add_job(daily, 'cron', hour=20, minute=23)
     scheduler.start()
     atexit.register(lambda: scheduler.shutdown())
 
