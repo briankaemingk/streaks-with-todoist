@@ -48,6 +48,7 @@ def register_shellcontext(app):
 
     app.shell_context_processor(shell_context)
 
+
 def hourly():
 
     app = create_app()
@@ -57,12 +58,15 @@ def hourly():
     users = User.query.all()
 
     for user in users:
-        api = TodoistAPI(user.access_token)
-        now = get_now_user_timezone(api)
-        print(now.hour, '   ', api.state['items'])
+        print(user.access_token)
+        # # api = TodoistAPI(user.access_token)
+        # # now = get_now_user_timezone(api)
+        # # print(now.hour, '   ', api.state['items'])
+        #
+        # if(now.hour == 0):
+        #     tasks = api.state['items']
 
-        if(now.hour == 0):
-            tasks = api.state['items']
+
     # for task in tasks:
     #     due_date_utc = task["due_date_utc"]
     #     if due_date_utc:
@@ -76,7 +80,7 @@ def hourly():
     #             api.commit()
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=hourly, trigger="cron", minute=29)
+scheduler.add_job(func=hourly, trigger="cron", minute=38)
 scheduler.start()
 
 # Shut down the scheduler when exiting the app
