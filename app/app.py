@@ -59,12 +59,13 @@ def hourly():
         print(user.access_token)
         api = initiate_api(user.access_token)
         now = get_now_user_timezone(api)
+        user_timezone = get_user_timezone(api)
         print(now.hour)
-        print("User timezone", user_timezone = get_now_user_timezone(api))
+        print("User timezone", user_timezone)
 
         if(now.hour == 0):
             tasks = api.state['items']
-            user_timezone = get_now_user_timezone(api)
+            user_timezone = get_user_timezone(api)
 
             for task in tasks:
                 due_date_utc = task["due_date_utc"]
@@ -79,7 +80,7 @@ def hourly():
                         api.commit()
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=hourly, trigger="cron", minute=59)
+scheduler.add_job(func=hourly, trigger="cron", minute=13)
 scheduler.start()
 
 # Shut down the scheduler when exiting the app
