@@ -1,5 +1,8 @@
 from flask import Flask
+from todoist.api import TodoistAPI
 from app import public, user, auth, webhooks
+from app.user.models import User
+from app.webhooks.todoist_webhook import get_now_user_timezone
 from app.config import Config
 from app.extensions import db, migrate
 from redis import Redis
@@ -11,9 +14,29 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 def print_date_time():
     print('Timer run')
+    users = User.query.all()
+
+    for user in users:
+        api = TodoistAPI(user.access_token)
+        now = get_now_user_timezone(api)
+        print(now.hour, '   ', api.state['items'])
+
+        if(now.hour == 0):
+            tasks = api.state['items']
+    # for task in tasks:
+    #     due_date_utc = task["due_date_utc"]
+    #     if due_date_utc:
+    #         due_date = convert_time_str_datetime(due_date_utc, user_timezone)
+    #         # If the task is due yesterday and it is a habit
+    #         if is_habit(task['content']) and is_due_yesterday(due_date, now):
+    #             update_streak(task, 0)
+    #             task.update(due_date_utc=update_to_all_day(now))
+    #             task.update(date_string=task['date_string'] + ' starting tod')
+    #             print(task['date_string'])
+    #             api.commit()
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=print_date_time, trigger="cron", minute=30)
+scheduler.add_job(func=print_date_time, trigger="cron", minute=4)
 scheduler.start()
 
 # Shut down the scheduler when exiting the app
