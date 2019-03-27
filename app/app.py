@@ -1,6 +1,5 @@
 from flask import Flask
 from todoist.api import TodoistAPI
-from app.app import create_app
 from app import public, user, auth, webhooks
 from app.user.models import User
 from app.webhooks.todoist_webhook import get_now_user_timezone
@@ -11,6 +10,18 @@ import rq
 import atexit
 
 from apscheduler.schedulers.background import BackgroundScheduler
+
+
+def create_app(config_class=Config):
+    app = Flask(__name__.split('.')[0])
+    app.config.from_object(config_class)
+    app.redis = Redis.from_url(app.config['REDIS_URL'])
+    app.task_queue = rq.Queue('swt-tasks', connection=app.redis)
+    register_extensions(app)
+    register_shellcontext(app)
+    register_blueprints(app)
+    return app
+
 
 app = create_app()
 app.app_context().push()
@@ -41,22 +52,12 @@ def hourly():
     #             api.commit()
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=hourly, trigger="cron", minute=20)
+scheduler.add_job(func=hourly, trigger="cron", minute=22)
 scheduler.start()
 
 # Shut down the scheduler when exiting the app
 atexit.register(lambda: scheduler.shutdown())
 
-
-def create_app(config_class=Config):
-    app = Flask(__name__.split('.')[0])
-    app.config.from_object(config_class)
-    app.redis = Redis.from_url(app.config['REDIS_URL'])
-    app.task_queue = rq.Queue('swt-tasks', connection=app.redis)
-    register_extensions(app)
-    register_shellcontext(app)
-    register_blueprints(app)
-    return app
 
 
 def register_extensions(app):
