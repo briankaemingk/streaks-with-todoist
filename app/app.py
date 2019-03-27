@@ -64,6 +64,7 @@ def hourly():
         print("User timezone", user_timezone)
 
         if(now.hour == 0):
+            print("Running at midnight local time")
             tasks = api.state['items']
             user_timezone = get_user_timezone(api)
 
@@ -71,6 +72,7 @@ def hourly():
                 due_date_utc = task["due_date_utc"]
                 if due_date_utc:
                     due_date = convert_time_str_datetime(due_date_utc, user_timezone)
+                    print(task['content'], ": Due date: " , due_date)
                     # If the task is due yesterday and it is a habit
                     if is_habit(task['content']) and is_due_yesterday(due_date, now):
                         print('updating overdue')
@@ -81,7 +83,7 @@ def hourly():
                         api.commit()
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=hourly, trigger="cron", minute=25)
+scheduler.add_job(func=hourly, trigger="cron", minute=30)
 scheduler.start()
 
 # Shut down the scheduler when exiting the app
