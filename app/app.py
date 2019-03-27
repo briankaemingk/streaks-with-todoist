@@ -23,6 +23,31 @@ def create_app(config_class=Config):
     return app
 
 
+def register_extensions(app):
+    db.init_app(app)
+    migrate.init_app(app, db)
+    return None
+
+
+def register_blueprints(app):
+    """Register Flask blueprints."""
+    app.register_blueprint(public.routes.blueprint)
+    app.register_blueprint(auth.routes.blueprint, url_prefix='/auth')
+    app.register_blueprint(webhooks.routes.blueprint, url_prefix='/webhooks')
+    app.register_blueprint(user.routes.blueprint, url_prefix='/user')
+    return None
+
+
+def register_shellcontext(app):
+    """Register shell context objects."""
+    def shell_context():
+        """Shell context objects."""
+        return {
+            'db': db,
+            'User': user.models.User}
+
+    app.shell_context_processor(shell_context)
+
 app = create_app()
 app.app_context().push()
 
@@ -52,35 +77,9 @@ def hourly():
     #             api.commit()
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=hourly, trigger="cron", minute=22)
+scheduler.add_job(func=hourly, trigger="cron", minute=26)
 scheduler.start()
 
 # Shut down the scheduler when exiting the app
 atexit.register(lambda: scheduler.shutdown())
 
-
-
-def register_extensions(app):
-    db.init_app(app)
-    migrate.init_app(app, db)
-    return None
-
-
-def register_blueprints(app):
-    """Register Flask blueprints."""
-    app.register_blueprint(public.routes.blueprint)
-    app.register_blueprint(auth.routes.blueprint, url_prefix='/auth')
-    app.register_blueprint(webhooks.routes.blueprint, url_prefix='/webhooks')
-    app.register_blueprint(user.routes.blueprint, url_prefix='/user')
-    return None
-
-
-def register_shellcontext(app):
-    """Register shell context objects."""
-    def shell_context():
-        """Shell context objects."""
-        return {
-            'db': db,
-            'User': user.models.User}
-
-    app.shell_context_processor(shell_context)
