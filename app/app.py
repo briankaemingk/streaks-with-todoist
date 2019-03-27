@@ -1,5 +1,6 @@
 from flask import Flask
 from todoist.api import TodoistAPI
+from app.app import create_app
 from app import public, user, auth, webhooks
 from app.user.models import User
 from app.webhooks.todoist_webhook import get_now_user_timezone
@@ -11,8 +12,12 @@ import atexit
 
 from apscheduler.schedulers.background import BackgroundScheduler
 
+app = create_app()
+app.app_context().push()
 
-def print_date_time():
+def hourly():
+
+
     print('Timer run')
     users = User.query.all()
 
@@ -36,7 +41,7 @@ def print_date_time():
     #             api.commit()
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=print_date_time, trigger="cron", minute=4)
+scheduler.add_job(func=hourly, trigger="cron", minute=20)
 scheduler.start()
 
 # Shut down the scheduler when exiting the app
