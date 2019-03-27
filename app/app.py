@@ -1,8 +1,7 @@
 from flask import Flask
-from todoist.api import TodoistAPI
 from app import public, user, auth, webhooks
 from app.user.models import User
-from app.webhooks.todoist_webhook import get_now_user_timezone, initiate_api
+from app.webhooks.todoist_webhook import get_now_user_timezone, initiate_api, convert_time_str_datetime, is_habit, update_streak, is_due_yesterday, update_to_all_day, get_user_timezone
 from app.config import Config
 from app.extensions import db, migrate
 from redis import Redis
@@ -45,7 +44,6 @@ def register_shellcontext(app):
         return {
             'db': db,
             'User': user.models.User}
-
     app.shell_context_processor(shell_context)
 
 
@@ -60,29 +58,28 @@ def hourly():
     for user in users:
         print(user.access_token)
         api = initiate_api(user.access_token)
-        print(api.state['items'])
-
         now = get_now_user_timezone(api)
-        print(now.hour, '   ', api.state['items'])
+        print(now.hour)
+        print("User timezone", user_timezone = get_now_user_timezone(api))
 
         if(now.hour == 0):
             tasks = api.state['items']
+            user_timezone = get_now_user_timezone(api)
 
-
-    # for task in tasks:
-    #     due_date_utc = task["due_date_utc"]
-    #     if due_date_utc:
-    #         due_date = convert_time_str_datetime(due_date_utc, user_timezone)
-    #         # If the task is due yesterday and it is a habit
-    #         if is_habit(task['content']) and is_due_yesterday(due_date, now):
-    #             update_streak(task, 0)
-    #             task.update(due_date_utc=update_to_all_day(now))
-    #             task.update(date_string=task['date_string'] + ' starting tod')
-    #             print(task['date_string'])
-    #             api.commit()
+            for task in tasks:
+                due_date_utc = task["due_date_utc"]
+                if due_date_utc:
+                    due_date = convert_time_str_datetime(due_date_utc, user_timezone)
+                    # If the task is due yesterday and it is a habit
+                    if is_habit(task['content']) and is_due_yesterday(due_date, now):
+                        update_streak(task, 0)
+                        task.update(due_date_utc=update_to_all_day(now))
+                        task.update(date_string=task['date_string'] + ' starting tod')
+                        print(task['date_string'])
+                        api.commit()
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=hourly, trigger="cron", minute=48)
+scheduler.add_job(func=hourly, trigger="cron", minute=59)
 scheduler.start()
 
 # Shut down the scheduler when exiting the app
