@@ -73,6 +73,7 @@ def hourly():
                     due_date = convert_time_str_datetime(due_date_utc, user_timezone)
                     # If the task is due yesterday and it is a habit
                     if is_habit(task['content']) and is_due_yesterday(due_date, now):
+                        print('updating overdue')
                         update_streak(task, 0)
                         task.update(due_date_utc=update_to_all_day(now))
                         task.update(date_string=task['date_string'] + ' starting tod')
@@ -80,7 +81,7 @@ def hourly():
                         api.commit()
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=hourly, trigger="cron", minute=13)
+scheduler.add_job(func=hourly, trigger="cron", minute=20)
 scheduler.start()
 
 # Shut down the scheduler when exiting the app
