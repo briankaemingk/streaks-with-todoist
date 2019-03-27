@@ -2,7 +2,7 @@ from flask import Flask
 from todoist.api import TodoistAPI
 from app import public, user, auth, webhooks
 from app.user.models import User
-from app.webhooks.todoist_webhook import get_now_user_timezone
+from app.webhooks.todoist_webhook import get_now_user_timezone, initiate_api
 from app.config import Config
 from app.extensions import db, migrate
 from redis import Redis
@@ -59,14 +59,14 @@ def hourly():
 
     for user in users:
         print(user.access_token)
-        api = TodoistAPI(user.access_token)
+        api = initiate_api(user.access_token)
         print(api.state['items'])
 
-        # # now = get_now_user_timezone(api)
-        # # print(now.hour, '   ', api.state['items'])
-        #
-        # if(now.hour == 0):
-        #     tasks = api.state['items']
+        now = get_now_user_timezone(api)
+        print(now.hour, '   ', api.state['items'])
+
+        if(now.hour == 0):
+            tasks = api.state['items']
 
 
     # for task in tasks:
@@ -82,7 +82,7 @@ def hourly():
     #             api.commit()
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=hourly, trigger="cron", minute=41)
+scheduler.add_job(func=hourly, trigger="cron", minute=48)
 scheduler.start()
 
 # Shut down the scheduler when exiting the app
