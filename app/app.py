@@ -59,7 +59,9 @@ def hourly():
 
     for user in users:
         print(user.access_token)
-        # # api = TodoistAPI(user.access_token)
+        api = TodoistAPI(user.access_token)
+        print(api.state['items'])
+
         # # now = get_now_user_timezone(api)
         # # print(now.hour, '   ', api.state['items'])
         #
@@ -80,7 +82,7 @@ def hourly():
     #             api.commit()
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=hourly, trigger="cron", minute=38)
+scheduler.add_job(func=hourly, trigger="cron", minute=41)
 scheduler.start()
 
 # Shut down the scheduler when exiting the app
