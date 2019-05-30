@@ -242,7 +242,7 @@ def task_added(api, task_id):
             api.notes.add(task_id, comment[1:-1])
 
     ##TODO: Extend feature to others
-    if ['user']['email'] == 'brian.e.k@gmail.com':
+    if api['user']['email'] == 'brian.e.k@gmail.com':
         if task['due_date_utc'] != None: task.update(priority=3)
 
 
