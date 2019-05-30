@@ -138,12 +138,17 @@ def task_updated(api, task_id):
         new_due_date_utc_str = convert_datetime_str(new_due_date_utc)
         task.update(content=re.sub(is_recurrence_diff(task["content"]).group(0), '', task["content"]))
         task.update(due_date_utc=new_due_date_utc_str)
+
     ##TODO: Extend feature to others
     if api['user']['email'] == 'brian.e.k@gmail.com':
         if task["due_date_utc"] != None :
-            if 'last_due_date' in api.activity.get(object_id=task['id'], limit=1)[0]['extra_data']:
-                if api.activity.get(object_id=task['id'], limit=1)[0]['extra_data']['last_due_date'] == None:
-                    task.update(priority=3)
+            if 'p4' not in task['content']:
+                if 'last_due_date' in api.activity.get(object_id=task['id'], limit=1)[0]['extra_data']:
+                    if api.activity.get(object_id=task['id'], limit=1)[0]['extra_data']['last_due_date'] == None:
+                        task.update(priority=3)
+            else :
+                content_no_p4 = task['content'].replace('p4', '')
+                task.update(content=content_no_p4)
 
 
 def is_recurrence_diff(task_content):
