@@ -141,8 +141,9 @@ def task_updated(api, task_id):
     ##TODO: Extend feature to others
     if api['user']['email'] == 'brian.e.k@gmail.com':
         if task["due_date_utc"] != None :
-            if api.activity.get(object_id=task['id'], limit=1)[0]['extra_data']['last_due_date'] == None :
-                task.update(priority=3)
+            if 'last_due_date' in api.activity.get(object_id=task['id'], limit=1)[0]['extra_data']:
+                if api.activity.get(object_id=task['id'], limit=1)[0]['extra_data']['last_due_date'] == None:
+                    task.update(priority=3)
 
 
 def is_recurrence_diff(task_content):
