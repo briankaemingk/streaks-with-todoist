@@ -254,7 +254,12 @@ def task_added(api, task_id):
 
     ##TODO: Extend feature to others
     if api['user']['email'] == 'brian.e.k@gmail.com':
-        if task['due_date_utc'] != None: task.update(priority=3)
+        if task['due_date_utc'] != None :
+            if 'p4' not in task['content']:
+                task.update(priority=3)
+            else:
+                content_no_p4 = task['content'].replace('p4', '')
+                task.update(content=content_no_p4)
 
 
 def reminder_fired(api, task_id):
