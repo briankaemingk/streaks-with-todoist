@@ -178,6 +178,11 @@ def task_complete(api, task_id):
             if check_recurring_task(api, task) and check_regular_intervals(task['date_string']): check_activity_log(api, task)
         increment_streak(task)
 
+        # Turn on OOO
+        if task['content'] == 'ooo mode' and api.projects.get_by_id(task['project_id'])['name'] == 'crt' :
+            for filter in api.filters.state['filters'] :
+                if filter['name'] == 'Level 1' : filter.update(query = 'overdue | due after: tod 23:59 & due before: tom 00:00 & !(##work & P4)')
+
 
 def increment_streak(task):
     """If a task is a habit, increase the streak by +1"""
