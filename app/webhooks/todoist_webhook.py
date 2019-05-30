@@ -200,7 +200,7 @@ def task_uncomplete(api, task_id):
             if filter['name'] == 'Level 1': filter.update(
                 query='overdue | (due after: tod 23:59 & due before: tom 00:00)')
             elif filter['name'] == 'Level 2': filter.update(
-                query='((overdue | (due after: tod 23:59 & due before: tom 00:00)) & !(##work & P4)) | search:_____ | ((@tDE & ! no due date) | (tom & @t2D) | (next 5 days & @t5D) | (next 8 days & @tW) | (next 32 days & @tM))')
+                query='(overdue | (due after: tod 23:59 & due before: tom 00:00)) | search:_____ | ((@tDE & ! no due date) | (tom & @t2D) | (next 5 days & @t5D) | (next 8 days & @tW) | (next 32 days & @tM))')
             elif filter['name'] == 'Level 3':
                 filter.update(
                     query='((overdue | (due after: tod 23:59 & due before: tom 00:00)) | search:_____ | ((@tDE & ! no due date) | (tom & @t2D) | (next 5 days & @t5D) | (next 8 days & @tW) | (next 32 days & @tM))) | (no due date & !(@TG & no due date) & !##WF - & !##Someday/Maybe & !no labels & !@AGENDAS & !@oADDON & !@wWF)')
