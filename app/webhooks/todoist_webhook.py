@@ -149,13 +149,13 @@ def task_updated(api, task_id):
     if api['user']['email'] == 'brian.e.k@gmail.com':
         if api.state['user']['is_premium']:
             if task["due_date_utc"] != None :
-                if 'p4' not in task['content']:
+                if 'P4' not in task['content']:
                     if 'last_due_date' in api.activity.get(object_id=task['id'], limit=1)[0]['extra_data']:
                         if api.activity.get(object_id=task['id'], limit=1)[0]['extra_data']['last_due_date'] == None:
                             task.update(priority=3)
                 else :
-                    content_no_p4 = task['content'].replace('p4', '')
-                    task.update(content=content_no_p4)
+                    content_no_P4 = task['content'].replace('P4', '')
+                    task.update(content=content_no_P4)
 
 
 def is_recurrence_diff(task_content):
@@ -187,7 +187,7 @@ def task_complete(api, task_id):
         # Turn on OOO
         if task['content'] == 'ooo mode' and api.projects.get_by_id(task['project_id'])['name'] == 'crt' :
             for filter in api.filters.state['filters'] :
-                if filter['name'] == 'Level 1' : filter.update(query = 'overdue | (due after: tod 23:59 & due before: tom 00:00) & !(##work & P4)')
+                if filter['name'] == 'Level 1' : filter.update(query = '(overdue | (due after: tod 23:59 & due before: tom 00:00)) & !(##work & P4)')
                 elif filter['name'] == 'Level 2' : filter.update(query = 'search:_____ | overdue | (due after: tod 23:59 & due before: tom 00:00) | (@tDE & ! no due date) | (tom & @t2D) | (next 5 days & @t5D) | (next 8 days & @tW) | (next 32 days & @tM) & !##work')
 
 
@@ -279,11 +279,11 @@ def task_added(api, task_id):
     ##TODO: Extend feature to others
     if api['user']['email'] == 'brian.e.k@gmail.com':
         if task['due_date_utc'] != None :
-            if 'p4' not in task['content']:
+            if 'P4' not in task['content']:
                 task.update(priority=3)
             else:
-                content_no_p4 = task['content'].replace('p4', '')
-                task.update(content=content_no_p4)
+                content_no_P4 = task['content'].replace('P4', '')
+                task.update(content=content_no_P4)
 
 
 def reminder_fired(api, task_id):
