@@ -23,8 +23,14 @@ def process_webhook(req, user):
             # Avoiding duplicates: if webhook callback content matches api content
             if req['event_data']['content'] == content:
                 task_complete(api, item_id)
-                item = api.items.get_by_id(item_id)
-                content = item['content']
+    if req['event_name'] == 'item:uncompleted':
+        item_id = int(req['event_data']['id'])
+        if api.items.get_by_id(item_id) is not None:
+            item = api.items.get_by_id(item_id)
+            content = item['content']
+            # Avoiding duplicates: if webhook callback content matches api content
+            if req['event_data']['content'] == content:
+                task_uncomplete(api, item_id)
     if req['event_name'] == 'reminder:fired':
         item_id = int(req['event_data']['item_id'])
         if api.items.get_by_id(item_id) is not None:
@@ -182,6 +188,16 @@ def task_complete(api, task_id):
         if task['content'] == 'ooo mode' and api.projects.get_by_id(task['project_id'])['name'] == 'crt' :
             for filter in api.filters.state['filters'] :
                 if filter['name'] == 'Level 1' : filter.update(query = 'overdue | due after: tod 23:59 & due before: tom 00:00 & !(##work & P4)')
+
+
+def task_uncomplete(api, task_id):
+    task = api.items.get_by_id(int(task_id))
+    print(task)
+    # Turn on OOO
+    if task['content'] == 'ooo mode' and api.projects.get_by_id(task['project_id'])['name'] == 'crt':
+        for filter in api.filters.state['filters']:
+            if filter['name'] == 'Level 1': filter.update(
+                query='overdue | due after: tod 23:59 & due before: tom 00:00')
 
 
 def increment_streak(task):
