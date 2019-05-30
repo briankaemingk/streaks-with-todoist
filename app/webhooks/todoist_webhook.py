@@ -232,14 +232,18 @@ def check_if_due_today(date, api):
 
 
 def task_added(api, task_id):
+    task = api.items.get_by_id(int(task_id))
     if api.state['user']['is_premium']:
-        task = api.items.get_by_id(int(task_id))
         content = task['content']
         if '{' in content and '}' in content:
             comment = re.findall('\{.*\}', content)[0]
             content_no_comment = content.replace(comment, '')
             task.update(content=content_no_comment)
             api.notes.add(task_id, comment[1:-1])
+
+    ##TODO: Extend feature to others
+    if ['user']['email'] == 'brian.e.k@gmail.com':
+        if task['due_date_utc'] != None: task.update(priority=3)
 
 
 def reminder_fired(api, task_id):
