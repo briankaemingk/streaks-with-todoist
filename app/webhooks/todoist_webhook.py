@@ -187,17 +187,19 @@ def task_complete(api, task_id):
         # Turn on OOO
         if task['content'] == 'ooo mode' and api.projects.get_by_id(task['project_id'])['name'] == 'crt' :
             for filter in api.filters.state['filters'] :
-                if filter['name'] == 'Level 1' : filter.update(query = 'overdue | due after: tod 23:59 & due before: tom 00:00 & !(##work & P4)')
+                if filter['name'] == 'Level 1' : filter.update(query = 'overdue | (due after: tod 23:59 & due before: tom 00:00) & !(##work & P4)')
+                elif filter['name'] == 'Level 2' : filter.update(query = 'search:_____ | overdue | (due after: tod 23:59 & due before: tom 00:00) | (@tDE & ! no due date) | (tom & @t2D) | (next 5 days & @t5D) | (next 8 days & @tW) | (next 32 days & @tM) & !##work')
 
 
 def task_uncomplete(api, task_id):
     task = api.items.get_by_id(int(task_id))
-    print(task)
     # Turn on OOO
     if task['content'] == 'ooo mode' and api.projects.get_by_id(task['project_id'])['name'] == 'crt':
         for filter in api.filters.state['filters']:
             if filter['name'] == 'Level 1': filter.update(
-                query='overdue | due after: tod 23:59 & due before: tom 00:00')
+                query='overdue | (due after: tod 23:59 & due before: tom 00:00)')
+            elif filter['name'] == 'Level 2': filter.update(
+                query='search:_____ | overdue | (due after: tod 23:59 & due before: tom 00:00) | (@tDE & ! no due date) | (tom & @t2D) | (next 5 days & @t5D) | (next 8 days & @tW) | (next 32 days & @tM)')
 
 
 def increment_streak(task):
