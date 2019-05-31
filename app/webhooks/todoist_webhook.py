@@ -176,8 +176,8 @@ def replace_due_date_time(new_due_time, due_date_utc, user_timezone):
     new_due_date_utc_date = new_due_date_localtz_date.astimezone(pytz.utc)
     return new_due_date_utc_date
 
-L1_BASE = "search:____________________Level 1____________________ | overdue | (due after: tod 23:59 & due before: tom 00:00)"
-L1_OOO_ADD = " & !(  ##work & P4)"
+L1_BASE = "search:____________________Level 1____________________ | (overdue | (due after: tod 23:59 & due before: tom 00:00))"
+L1_OOO_ADD = " & !(##work & P4)"
 
 def task_complete(api, task_id):
     task = api.items.get_by_id(int(task_id))
