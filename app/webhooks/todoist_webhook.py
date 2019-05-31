@@ -179,8 +179,12 @@ def replace_due_date_time(new_due_time, due_date_utc, user_timezone):
 L1_LABEL = "search:_______________Level 1_______________ | "
 L2_LABEL = "search:_______________Level 2_______________ | "
 L3_LABEL = "search:_______________Level 3_______________ | "
+L1_CLEAN_LABEL = "search:______________Level 1 - clean______________ | "
+L2_CLEAN_LABEL = "search:______________Level 2 - clean______________ | "
 
 OOO_LABEL = "search:_OOO_ |"
+OOO_ADD =  " &  !(tod & ##work & P4) & !(due after: tod & ##work)"
+CLEAN_ADD = " & !(search:Cleared L1 | search:Cleared L2)"
 
 L1_BASE =  "(overdue | (due after: tod 23:59 & due before: tom 00:00))"
 L2_BASE = " | search:_____ | ((@tDE & ! no due date) | (tom & @t2D) | (next 5 days & @t5D) | (next 8 days & @tW) | (next 32 days & @tM))"
@@ -190,7 +194,9 @@ L1 =  L1_LABEL + L1_BASE
 L2 = L2_LABEL + L1_BASE + L2_BASE
 L3 = L3_LABEL + L1_BASE + L2_BASE + L3_BASE
 
-OOO_ADD =  "&  !(tod & ##work & P4) & !(due after: tod & ##work)"
+L1_CLEAN =  L1_CLEAN_LABEL + '(' + L1_BASE + ')' + CLEAN_ADD
+L2_CLEAN = L2_CLEAN_LABEL + '(' + L1_BASE + L2_BASE + ')' + CLEAN_ADD
+
 
 def task_complete(api, task_id):
     task = api.items.get_by_id(int(task_id))
@@ -202,9 +208,12 @@ def task_complete(api, task_id):
         # Turn on OOO
         if task['content'] == 'ooo mode' and api.projects.get_by_id(task['project_id'])['name'] == 'crt' :
             for filter in api.filters.state['filters'] :
-                if filter['name'] == 'Level 1' : filter.update(query = OOO_LABEL + '(' + filter['query'] + ')' + OOO_ADD)
-                elif filter['name'] == 'Level 2' : filter.update(query = OOO_LABEL + '(' + filter['query'] + ')' + OOO_ADD)
-                elif filter['name'] == 'Level 3' : filter.update(query = OOO_LABEL + '(' + filter['query'] + ')' + OOO_ADD)
+                query = filter['query']
+                if filter['name'] == 'Level 1' : add_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
+                if filter['name'] == 'Level 2' : add_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
+                if filter['name'] == 'Level 3' : add_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
+                if filter['name'] == 'Level 1 - clean' : add_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
+                if filter['name'] == 'Level 2 - clean' : add_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
 
 
 def task_uncomplete(api, task_id):
@@ -212,10 +221,20 @@ def task_uncomplete(api, task_id):
     # Turn off OOO
     if task['content'] == 'ooo mode' and api.projects.get_by_id(task['project_id'])['name'] == 'crt':
         for filter in api.filters.state['filters']:
-            if filter['name'] == 'Level 1': filter.update(query=L1)
-            elif filter['name'] == 'Level 2': filter.update(query=L2)
-            elif filter['name'] == 'Level 3': filter.update(query=L3)
+            query = filter['query']
+            if filter['name'] == 'Level 1': strip_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
+            if filter['name'] == 'Level 2': strip_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
+            if filter['name'] == 'Level 3': strip_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
+            if filter['name'] == 'Level 1 - clean': strip_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
+            if filter['name'] == 'Level 2 - clean': strip_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
 
+def strip_label_add_query(filter, query, label_string, add_string):
+    new_query = query.replace(label_string, '')
+    new_query = new_query.replace(add_string, '')
+    filter.update(query=new_query)
+
+def add_label_add_query(filter, query, label_string, add_string):
+    filter.update(query=label_string + '(' + query + ')' + add_string)
 
 def increment_streak(task):
     """If a task is a habit, increase the streak by +1"""
