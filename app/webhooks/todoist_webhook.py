@@ -176,6 +176,8 @@ def replace_due_date_time(new_due_time, due_date_utc, user_timezone):
     new_due_date_utc_date = new_due_date_localtz_date.astimezone(pytz.utc)
     return new_due_date_utc_date
 
+L1_BASE = "search:____________________Level 1____________________ | overdue | (due after: tod 23:59 & due before: tom 00:00)"
+L1_OOO_ADD = " & !(  ##work & P4)"
 
 def task_complete(api, task_id):
     task = api.items.get_by_id(int(task_id))
@@ -187,7 +189,7 @@ def task_complete(api, task_id):
         # Turn on OOO
         if task['content'] == 'ooo mode' and api.projects.get_by_id(task['project_id'])['name'] == 'crt' :
             for filter in api.filters.state['filters'] :
-                if filter['name'] == 'Level 1' : filter.update(query = '(overdue | (due after: tod 23:59 & due before: tom 00:00)) & !(##work & P4)')
+                if filter['name'] == 'Level 1' : filter.update(query = L1_BASE + L1_OOO_ADD)
                 elif filter['name'] == 'Level 2' : filter.update(query = '((overdue | (due after: tod 23:59 & due before: tom 00:00)) & !(##work & P4)) | search:_____ | (((@tDE & ! no due date) | (tom & @t2D) | (next 5 days & @t5D) | (next 8 days & @tW) | (next 32 days & @tM)) & !##work)')
                 elif filter['name'] == 'Level 3' : filter.update(query = '((overdue | (due after: tod 23:59 & due before: tom 00:00)) & !(##work & P4)) | search:_____ | (((@tDE & ! no due date) | (tom & @t2D) | (next 5 days & @t5D) | (next 8 days & @tW) | (next 32 days & @tM)) & !##work) | ((no due date & !(@TG & no due date) & !##WF - & !##Someday/Maybe & !no labels & !@AGENDAS & !@oADDON & !@wWF) & !##work)')
 
@@ -198,7 +200,7 @@ def task_uncomplete(api, task_id):
     if task['content'] == 'ooo mode' and api.projects.get_by_id(task['project_id'])['name'] == 'crt':
         for filter in api.filters.state['filters']:
             if filter['name'] == 'Level 1': filter.update(
-                query='overdue | (due after: tod 23:59 & due before: tom 00:00)')
+                query=L1_BASE)
             elif filter['name'] == 'Level 2': filter.update(
                 query='(overdue | (due after: tod 23:59 & due before: tom 00:00)) | search:_____ | ((@tDE & ! no due date) | (tom & @t2D) | (next 5 days & @t5D) | (next 8 days & @tW) | (next 32 days & @tM))')
             elif filter['name'] == 'Level 3':
