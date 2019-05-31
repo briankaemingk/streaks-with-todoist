@@ -192,9 +192,6 @@ L3 = L3_LABEL + L1_BASE + L2_BASE + L3_BASE
 
 OOO_ADD =  "&  !(tod & ##work & P4) & !(due after: tod & ##work)"
 
-L1_OOO = L1_LABEL + '(' + L1_BASE + ')'+ OOO_ADD
-L2_OOO = L2_LABEL + '(' + L1_BASE + L2_BASE + ')'+ OOO_ADD
-
 def task_complete(api, task_id):
     task = api.items.get_by_id(int(task_id))
     if task is not None:
@@ -205,9 +202,9 @@ def task_complete(api, task_id):
         # Turn on OOO
         if task['content'] == 'ooo mode' and api.projects.get_by_id(task['project_id'])['name'] == 'crt' :
             for filter in api.filters.state['filters'] :
-                if filter['name'] == 'Level 1' : filter.update(query = OOO_LABEL + '(' + filter.query + ')' + OOO_ADD)
-                elif filter['name'] == 'Level 2' : filter.update(query = OOO_LABEL + '(' + filter.query + ')' + OOO_ADD)
-                elif filter['name'] == 'Level 3' : filter.update(query = OOO_LABEL + '(' + filter.query + ')' + OOO_ADD)
+                if filter['name'] == 'Level 1' : filter.update(query = OOO_LABEL + '(' + filter['query'] + ')' + OOO_ADD)
+                elif filter['name'] == 'Level 2' : filter.update(query = OOO_LABEL + '(' + filter['query'] + ')' + OOO_ADD)
+                elif filter['name'] == 'Level 3' : filter.update(query = OOO_LABEL + '(' + filter['query'] + ')' + OOO_ADD)
 
 
 def task_uncomplete(api, task_id):
