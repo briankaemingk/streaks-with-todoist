@@ -176,9 +176,9 @@ def replace_due_date_time(new_due_time, due_date_utc, user_timezone):
     new_due_date_utc_date = new_due_date_localtz_date.astimezone(pytz.utc)
     return new_due_date_utc_date
 
-L1_LABEL = "search:____________________Level 1____________________ | "
-L2_LABEL = "search:____________________Level 2____________________ | "
-L3_LABEL = "search:____________________Level 3____________________ | "
+L1_LABEL = "search:_______________Level 1_______________ | "
+L2_LABEL = "search:_______________Level 2_______________ | "
+L3_LABEL = "search:_______________Level 3_______________ | "
 
 OOO_LABEL = "search:_OOO_ |"
 
