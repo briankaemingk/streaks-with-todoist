@@ -7,6 +7,7 @@ from app.extensions import db, migrate
 from redis import Redis
 import rq
 import atexit
+from pytz import utc
 
 from apscheduler.schedulers.background import BackgroundScheduler
 
@@ -80,7 +81,7 @@ def hourly():
                         api.commit()
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=hourly, trigger="cron", minute=0)
+scheduler.add_job(func=hourly, trigger="cron", minute=0, timezone=utc)
 scheduler.start()
 
 # Shut down the scheduler when exiting the app
