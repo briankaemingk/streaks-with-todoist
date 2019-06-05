@@ -49,7 +49,7 @@ sudo apt install postgresql postgresql-contrib
     CLIENT_SECRET=...343j...
     ```    
 6. Start a tunnel using serveo: `ssh -R local-streaks-with-todoist:80:localhost:5000 serveo.net` 
-7. Start the redis server with: `rq worker swt-tasks`
+7. Start the redis server with: `rq worker swt-tasks` (don't forget to start ssh with `sudo service ssh start` and redis with `sudo service redis-server` )
 7. Run the app locally using `flask run`
 
 ### Staging Installation
