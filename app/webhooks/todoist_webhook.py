@@ -176,12 +176,12 @@ def replace_due_date_time(new_due_time, due_date_utc, user_timezone):
     new_due_date_utc_date = new_due_date_localtz_date.astimezone(pytz.utc)
     return new_due_date_utc_date
 
-SPACER = "_______"
-L1_LABEL = "search:" + SPACER + "Level 1" + SPACER + " | "
-L2_LABEL = "search:" + SPACER + "Level 2" + SPACER + " | "
-L3_LABEL = "search:" + SPACER + "Level 3" + SPACER + " | "
-L1_CLEAN_LABEL = "search:" + SPACER + "Level 1 - clean" + SPACER + " | "
-L2_CLEAN_LABEL = "search:" + SPACER + "Level 2 - clean" + SPACER + " | "
+RIGHT_SPACER = "_________________________________"
+L1_LABEL = "search:" + "Level 1" + RIGHT_SPACER + " | "
+L2_LABEL = "search:" + "Level 2" + RIGHT_SPACER + " | "
+L3_LABEL = "search:" + "Level 3" + RIGHT_SPACER + " | "
+L1_CLEAN_LABEL = "search:" + "Level 1 - clean" + RIGHT_SPACER + " | "
+L2_CLEAN_LABEL = "search:" + "Level 2 - clean" + RIGHT_SPACER + " | "
 
 OOO_LABEL = "search:_OOO_ |"
 OOO_ADD =  " &  !(tod & ##work & P4) & !(due after: tod & ##work)"
@@ -197,6 +197,17 @@ L3 = L3_LABEL + L1_BASE + L2_BASE + L3_BASE
 
 L1_CLEAN =  L1_CLEAN_LABEL + '(' + L1_BASE + ')' + CLEAN_ADD
 L2_CLEAN = L2_CLEAN_LABEL + '(' + L1_BASE + L2_BASE + ')' + CLEAN_ADD
+
+
+def reset_base_filters(api):
+    for filter in api.filters.state['filters']:
+        if filter['name'] == 'Level 1': filter.update(query=L1)
+        if filter['name'] == 'Level 2': filter.update(query=L2)
+        if filter['name'] == 'Level 3': filter.update(query=L3)
+        if filter['name'] == 'Level 1 - clean': filter.update(query=L1_CLEAN)
+        if filter['name'] == 'Level 2 - clean': filter.update(query=L2_CLEAN)
+    api.commit()
+
 
 
 def task_complete(api, task_id):
