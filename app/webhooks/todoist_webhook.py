@@ -146,16 +146,22 @@ def task_updated(api, task_id):
         task.update(due_date_utc=new_due_date_utc_str)
 
     ##TODO: Extend feature to others
-    if api['user']['email'] == 'brian.e.k@gmail.com':
+    if api['user']['email'] == 'brian.e.k@gmail.com' or 'bek4@alumni.calvin.edu' or 'brian.kaemingk.2012@marshall.usc.edu':
         if api.state['user']['is_premium']:
             if task["due_date_utc"] != None :
                 if 'P4' not in task['content']:
                     if 'last_due_date' in api.activity.get(object_id=task['id'], limit=1)[0]['extra_data']:
                         if api.activity.get(object_id=task['id'], limit=1)[0]['extra_data']['last_due_date'] == None:
                             task.update(priority=3)
-                else :
+                else:
                     content_no_P4 = task['content'].replace('P4', '')
                     task.update(content=content_no_P4)
+
+            # Remove date
+            else:
+                if 'last_due_date' in api.activity.get(object_id=task['id'], limit=1)[0]['extra_data']:
+                    if api.activity.get(object_id=task['id'], limit=1)[0]['extra_data']['last_due_date'] != None:
+                        task.update(priority=0)
 
 
 def is_recurrence_diff(task_content):
@@ -323,7 +329,7 @@ def task_added(api, task_id):
             api.notes.add(task_id, comment[1:-1])
 
     ##TODO: Extend feature to others
-    if api['user']['email'] == 'brian.e.k@gmail.com':
+    if api['user']['email'] == 'brian.e.k@gmail.com' or 'bek4@alumni.calvin.edu' or 'brian.kaemingk.2012@marshall.usc.edu':
         if task['due_date_utc'] != None :
             if 'P4' not in task['content']:
                 task.update(priority=3)
