@@ -68,6 +68,8 @@ def hourly():
             user_timezone = get_user_timezone(api)
 
             for task in tasks:
+                if task['content'].startswith("Cleared L2"): task.update(date_string='tom')
+
                 due_date_utc = task["due_date_utc"]
                 if due_date_utc:
                     due_date = convert_time_str_datetime(due_date_utc, user_timezone)
