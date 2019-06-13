@@ -192,6 +192,9 @@ L2_CLEAN_LABEL = "search:" + "Level 2 - clean" + RIGHT_SPACER + " | "
 
 OOO_LABEL = "search:_OOO_ |"
 OOO_ADD =  " &  !(tod & ##work & P4) & !(due after: tod & ##work)"
+NO_COMP_LABEL = "search:_NO COMP_ |"
+NO_COMP_ADD = " &  !@COMP"
+
 CLEAN_ADD = " & !(search:Cleared L1 | search:Cleared L2)"
 
 L1_BASE =  "(overdue | (due after: tod 23:59 & due before: tom 00:00))"
@@ -237,9 +240,20 @@ def task_complete(api, task_id):
                 if filter['name'] == 'Level 1 - clean' : add_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
                 if filter['name'] == 'Level 2 - clean' : add_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
 
-
             #TODO: Extend feature this to other users
             urllib.request.urlopen(URL).read()
+
+
+        # Turn on no computer
+        if task['content'] == 'no computer' and api.projects.get_by_id(task['project_id'])['name'] == 'crt' :
+            for filter in api.filters.state['filters'] :
+                query = filter['query']
+                if filter['name'] == 'Level 1' : add_label_add_query(filter, query, NO_COMP_LABEL, NO_COMP_ADD)
+                if filter['name'] == 'Level 2' : add_label_add_query(filter, query, NO_COMP_LABEL, NO_COMP_ADD)
+                if filter['name'] == 'Level 3' : add_label_add_query(filter, query, NO_COMP_LABEL, NO_COMP_ADD)
+                if filter['name'] == 'Level 1 - clean' : add_label_add_query(filter, query, NO_COMP_LABEL, NO_COMP_ADD)
+                if filter['name'] == 'Level 2 - clean' : add_label_add_query(filter, query, NO_COMP_LABEL, NO_COMP_ADD)
+
 
 
 
