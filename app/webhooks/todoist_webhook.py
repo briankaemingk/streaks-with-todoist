@@ -272,6 +272,16 @@ def task_uncomplete(api, task_id):
         # TODO: Extend feature this to other users
         urllib.request.urlopen(URL).read()
 
+    # Turn off no computer
+    if task['content'] == 'no computer' and api.projects.get_by_id(task['project_id'])['name'] == 'crt':
+        for filter in api.filters.state['filters']:
+            query = filter['query']
+            if filter['name'] == 'Level 1': strip_label_add_query(filter, query, NO_COMP_LABEL, NO_COMP_ADD)
+            if filter['name'] == 'Level 2': strip_label_add_query(filter, query, NO_COMP_LABEL, NO_COMP_ADD)
+            if filter['name'] == 'Level 3': strip_label_add_query(filter, query, NO_COMP_LABEL, NO_COMP_ADD)
+            if filter['name'] == 'Level 1 - clean': strip_label_add_query(filter, query, NO_COMP_LABEL, NO_COMP_ADD)
+            if filter['name'] == 'Level 2 - clean': strip_label_add_query(filter, query, NO_COMP_LABEL, NO_COMP_ADD)
+
 def strip_label_add_query(filter, query, label_string, add_string):
     new_query = query.replace(label_string, '')
     new_query = new_query.replace(add_string, '')
