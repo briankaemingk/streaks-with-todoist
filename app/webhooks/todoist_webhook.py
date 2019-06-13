@@ -146,11 +146,19 @@ def task_updated(api, task_id):
         task.update(content=re.sub(is_recurrence_diff(task["content"]).group(0), '', task["content"]))
         task.update(due_date_utc=new_due_date_utc_str)
 
-    ##TODO: Extend feature to others
+    ##TODO: Priority/convenience tasks: Extend feature to others
     if api['user']['email'] == 'brian.e.k@gmail.com' or 'bek4@alumni.calvin.edu' or 'brian.kaemingk.2012@marshall.usc.edu':
         if api.state['user']['is_premium']:
             if task["due_date_utc"] != None :
-                if 'P4' not in task['content']:
+                # Special behavior for return date filter
+                if task['content'] == 'return date' and api.projects.get_by_id(task['project_id'])['name'] == 'crt':
+                    if 'last_due_date' in api.activity.get(object_id=task['id'], limit=1)[0]['extra_data']:
+                        if api.activity.get(object_id=task['id'], limit=1)[0]['extra_data']['last_due_date'] == None:
+                            for filter in api.filters.state['filters']:
+                                if filter['name'] == 'Vacation': filter.update(query="search:hi")
+
+                # Regular behavior for date added
+                elif 'P4' not in task['content']:
                     if 'last_due_date' in api.activity.get(object_id=task['id'], limit=1)[0]['extra_data']:
                         if api.activity.get(object_id=task['id'], limit=1)[0]['extra_data']['last_due_date'] == None:
                             task.update(priority=3)
