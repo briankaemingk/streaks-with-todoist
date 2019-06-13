@@ -5,6 +5,7 @@ import os
 import random
 import re
 import string
+import urllib.request
 from datetime import datetime, timedelta
 import pytz
 from flask import request
@@ -204,6 +205,9 @@ L3 = L3_LABEL + L1_BASE + L2_BASE + L3_BASE
 L1_CLEAN =  L1_CLEAN_LABEL + '(' + L1_BASE + ')' + CLEAN_ADD
 L2_CLEAN = L2_CLEAN_LABEL + '(' + L1_BASE + L2_BASE + ')' + CLEAN_ADD
 
+# TODO: Extend feature to other users
+URL = "https://autoremotejoaomgcd.appspot.com/sendmessage?key=c8tCXPZCbOo:APA91bHo7mE18uWREnh4UJFUutEsBEj0M1mbDRKz7A5KRhHZXvkngSBdVbRnLJxrtJ7oQAwi3dCTYSz1D1rymnX1uRt7iATl_Efbkdx5IDHhnvQ53Dgyfxq-G401f0p01GXFZDmqiQ5r&message=OOO_toggle"
+
 
 def reset_base_filters(api):
     for filter in api.filters.state['filters']:
@@ -234,6 +238,11 @@ def task_complete(api, task_id):
                 if filter['name'] == 'Level 2 - clean' : add_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
 
 
+            #TODO: Extend feature this to other users
+            urllib.request.urlopen(URL).read()
+
+
+
 def task_uncomplete(api, task_id):
     task = api.items.get_by_id(int(task_id))
     # Turn off OOO
@@ -245,6 +254,9 @@ def task_uncomplete(api, task_id):
             if filter['name'] == 'Level 3': strip_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
             if filter['name'] == 'Level 1 - clean': strip_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
             if filter['name'] == 'Level 2 - clean': strip_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
+
+        # TODO: Extend feature this to other users
+        urllib.request.urlopen(URL).read()
 
 def strip_label_add_query(filter, query, label_string, add_string):
     new_query = query.replace(label_string, '')
