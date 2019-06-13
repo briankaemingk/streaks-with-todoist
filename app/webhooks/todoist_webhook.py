@@ -156,6 +156,9 @@ def task_updated(api, task_id):
                         if api.activity.get(object_id=task['id'], limit=1)[0]['extra_data']['last_due_date'] == None:
                             for filter in api.filters.state['filters']:
                                 if filter['name'] == 'Vacation': filter.update(query="search:hi")
+                        if api.activity.get(object_id=task['id'], limit=1)[0]['extra_data']['last_due_date'] != task["due_date_utc"]:
+                            for filter in api.filters.state['filters']:
+                                if filter['name'] == 'Vacation': filter.update(query="search:hi")
 
                 # Regular behavior for date added
                 elif 'P4' not in task['content']:
