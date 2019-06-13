@@ -157,7 +157,7 @@ def task_updated(api, task_id):
                         if last_due_date == None or last_due_date != task["due_date_utc"]:
                             for filter in api.filters.state['filters']:
                                 if filter['name'] == 'Vacation': filter.update(query="search:hi")
-                                print ("Last due date: " + last_due_date)
+                                if last_due_date != None : print ("Last due date: " + last_due_date)
                                 print("Due date utc: " + task["due_date_utc"])
 
                 # Regular behavior for date added
