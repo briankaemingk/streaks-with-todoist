@@ -153,12 +153,10 @@ def task_updated(api, task_id):
                 # Special behavior for return date filter
                 if task['content'] == 'return date' and api.projects.get_by_id(task['project_id'])['name'] == 'crt':
                     if 'last_due_date' in api.activity.get(object_id=task['id'], limit=1)[0]['extra_data']:
-                        if api.activity.get(object_id=task['id'], limit=1)[0]['extra_data']['last_due_date'] == None:
+                        last_due_date = api.activity.get(object_id=task['id'], limit=1)[0]['extra_data']['last_due_date']
+                        if last_due_date == None or last_due_date != task["due_date_utc"]:
                             for filter in api.filters.state['filters']:
                                 if filter['name'] == 'Vacation': filter.update(query="search:hi")
-                        if api.activity.get(object_id=task['id'], limit=1)[0]['extra_data']['last_due_date'] != task["due_date_utc"]:
-                            for filter in api.filters.state['filters']:
-                                if filter['name'] == 'Vacation': filter.update(query="search:due date utc " + task["due_date_utc"] + " | " + "search: last due date " + api.activity.get(object_id=task['id'], limit=1)[0]['extra_data']['last_due_date'])
 
                 # Regular behavior for date added
                 elif 'P4' not in task['content']:
