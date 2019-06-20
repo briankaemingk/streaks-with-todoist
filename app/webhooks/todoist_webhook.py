@@ -156,9 +156,10 @@ def task_updated(api, task_id):
                         last_due_date = api.activity.get(object_id=task['id'], limit=1)[0]['extra_data']['last_due_date']
                         if last_due_date == None or last_due_date != task["due_date_utc"]:
                             for filter in api.filters.state['filters']:
-                                if filter['name'] == 'Vacation': filter.update(query="search:" + task["due_date_utc"])
-                                if last_due_date != None : print ("Last due date: " + last_due_date)
-                                print("Due date utc: " + task["due_date_utc"])
+                                if filter['name'] == 'Vacation':
+                                    return_date = task['date_string']
+                                    #todo: convert to date, add to dates
+                                    filter.update(query="search:Return date - " + return_date + RIGHT_SPACER + " | search: _____ | due before: " + return_date + 1 + " | (@ tDE & ! no due date) | (" + return_date + 1 + " & @t2D) | (due before: " + return_date + 6 + " & @t5D) | (due before: " + return_date + 8 + " & @tW) | (due before: " + return_date + 32 + " & @tM)")
 
                 # Regular behavior for date added
                 elif 'P4' not in task['content']:
@@ -376,7 +377,7 @@ def task_added(api, task_id):
             api.notes.add(task_id, comment[1:-1])
 
     ##TODO: Extend feature to others
-    if api['user']['email'] == 'brian.e.k@gmail.com' or 'bek4@alumni.calvin.edu' or 'brian.kaemingk.2012@marshall.usc.edu':
+    if api['user']['email'] == 'brian.e.k@gmail.com' or 'bek4@alumni.calvin.edu':
         if task['due_date_utc'] != None :
             if 'P4' not in task['content']:
                 task.update(priority=3)
