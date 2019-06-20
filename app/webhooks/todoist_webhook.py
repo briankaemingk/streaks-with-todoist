@@ -146,8 +146,10 @@ def task_updated(api, task_id):
         task.update(content=re.sub(is_recurrence_diff(task["content"]).group(0), '', task["content"]))
         task.update(due_date_utc=new_due_date_utc_str)
 
+
     ##TODO: Priority/convenience tasks: Extend feature to others
-    if api['user']['email'] == 'brian.e.k@gmail.com' or 'bek4@alumni.calvin.edu' or 'brian.kaemingk.2012@marshall.usc.edu':
+    user_email = api['user']['email']
+    if user_email == 'brian.e.k@gmail.com' or user_email == 'bek4@alumni.calvin.edu' or user_email == 'brian.kaemingk.2012@marshall.usc.edu':
         if api.state['user']['is_premium']:
             if task["due_date_utc"] != None :
                 # Special behavior for return date filter
@@ -377,7 +379,8 @@ def task_added(api, task_id):
             api.notes.add(task_id, comment[1:-1])
 
     ##TODO: Extend feature to others
-    if api['user']['email'] == 'brian.e.k@gmail.com' or api['user']['email'] == 'bek4@alumni.calvin.edu':
+    user_email = api['user']['email']
+    if user_email == 'brian.e.k@gmail.com' or user_email == 'bek4@alumni.calvin.edu' or user_email == 'brian.kaemingk.2012@marshall.usc.edu':
         if task['due_date_utc'] != None :
             if 'P4' not in task['content']:
                 task.update(priority=3)
