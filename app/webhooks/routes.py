@@ -16,7 +16,9 @@ def webhook_callback():
         if(user_exists):
             current_user = User.query.get(user_id)
             current_user.launch_task('process_webhooks', 'Processing webhook', req)
+            db.session.close()
         return jsonify({'status': 'accepted', 'request_id': event_id}), 200
     else:
+        db.session.close()
         return jsonify({'status': 'rejected',
                             'reason': 'malformed request'}), 400
