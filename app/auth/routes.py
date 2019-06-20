@@ -37,6 +37,7 @@ def oauth_callback():
             db.session.commit()
             settings_list = create_settings_list(u)
             session['settings_list'] = settings_list
+            session.close()
             return redirect(url_for('user.settings'))
     else: return 'Request for Streaks with Todoist not authorized, exiting. Go <a href=' + "/" + '>back</a>'
 
