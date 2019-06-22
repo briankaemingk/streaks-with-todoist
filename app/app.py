@@ -58,29 +58,32 @@ def hourly():
 
     for user in users:
         api = initiate_api(user.access_token)
-        now = get_now_user_timezone(api)
-        user_timezone = get_user_timezone(api)
-        print("User timezone: ", user_timezone, " Hour: ", now.hour)
-
-        if(now.hour == 0):
-            print("Running at midnight local time")
-            tasks = api.state['items']
+        if api is None:
+            return 'Request for Streaks with Todoist not authorized, exiting.'
+        else:
+            now = get_now_user_timezone(api)
             user_timezone = get_user_timezone(api)
+            print("User timezone: ", user_timezone, " Hour: ", now.hour)
 
-            for task in tasks:
-                if task['content'].startswith("Cleared L2"): task.update(date_string='tom')
+            if(now.hour == 0):
+                print("Running at midnight local time")
+                tasks = api.state['items']
+                user_timezone = get_user_timezone(api)
 
-                due_date_utc = task["due_date_utc"]
-                if due_date_utc:
-                    due_date = convert_time_str_datetime(due_date_utc, user_timezone)
-                    # If the task is due yesterday and it is a habit
-                    if is_habit(task['content']) and is_due_yesterday(due_date, now):
-                        print('Updating overdue for task: ', task['content'])
-                        update_streak(task, 0)
-                        task.update(due_date_utc=update_to_all_day(now))
-                        task.update(date_string=task['date_string'] + ' starting tod')
-                        print("Updated to new date: ", task['date_string'])
-                        api.commit()
+                for task in tasks:
+                    if task['content'].startswith("Cleared L2"): task.update(date_string='tom')
+
+                    due_date_utc = task["due_date_utc"]
+                    if due_date_utc:
+                        due_date = convert_time_str_datetime(due_date_utc, user_timezone)
+                        # If the task is due yesterday and it is a habit
+                        if is_habit(task['content']) and is_due_yesterday(due_date, now):
+                            print('Updating overdue for task: ', task['content'])
+                            update_streak(task, 0)
+                            task.update(due_date_utc=update_to_all_day(now))
+                            task.update(date_string=task['date_string'] + ' starting tod')
+                            print("Updated to new date: ", task['date_string'])
+                            api.commit()
 
 scheduler = BackgroundScheduler()
 scheduler.add_job(func=hourly, trigger="cron", minute=0, timezone=utc)

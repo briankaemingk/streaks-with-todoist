@@ -14,6 +14,8 @@ from todoist import TodoistAPI
 
 def process_webhook(req, user):
     api = initiate_api(user.access_token)
+    if api is None:
+        return 'Request for Streaks with Todoist not authorized, exiting.'
     local_time = str(get_now_user_timezone(api))
 
     if req['event_name'] == 'item:completed':
@@ -87,7 +89,8 @@ def initiate_api(access_token):
     """Initiate and sync Todoist API"""
     api = TodoistAPI(access_token)
     api.sync()
-    return api
+    if bool(api['user']) : return api
+    else: return None
 
 
 def compute_hmac():

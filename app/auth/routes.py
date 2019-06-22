@@ -18,6 +18,8 @@ def oauth_callback():
             return 'Request for Streaks with Todoist not authorized, exiting. Go <a href=' + "/" + '>back</a>'
         access_token = initialize_token(code)
         api = initiate_api(access_token)
+        if api is None:
+            return 'Request for Streaks with Todoist not authorized, exiting. Go <a href=' + "/" + '>back</a>'
         user_id = api.state['user']['id']
         user_exists = db.session.query(User.id).filter_by(id=user_id).scalar() is not None
         if not user_exists:
