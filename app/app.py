@@ -48,10 +48,10 @@ def register_shellcontext(app):
     app.shell_context_processor(shell_context)
 
 
-def hourly():
+def hourly(app):
 
-    app = create_app()
-    app.app_context().push()
+    # app = create_app()
+    # app.app_context().push()
 
     print('Timer run')
     users = User.query.all()
@@ -86,11 +86,7 @@ def hourly():
                             api.commit()
     db.session.remove()
 
-scheduler = BackgroundScheduler()
-# Shut down the scheduler when exiting the app
-atexit.register(lambda: scheduler.shutdown(wait=False))
-scheduler.add_job(func=hourly, trigger="cron", minute=0, timezone=utc)
-scheduler.start()
+
 
 
 
