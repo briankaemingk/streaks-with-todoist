@@ -20,6 +20,11 @@ def create_app(config_class=Config):
     register_extensions(app)
     register_shellcontext(app)
     register_blueprints(app)
+    scheduler = BackgroundScheduler()
+    # Shut down the scheduler when exiting the app
+    atexit.register(lambda: scheduler.shutdown(wait=False))
+    scheduler.add_job(func=hourly, trigger="cron", minute=44, timezone=utc)
+    scheduler.start()
     return app
 
 
@@ -88,8 +93,4 @@ def hourly():
 
 
 
-scheduler = BackgroundScheduler()
-# Shut down the scheduler when exiting the app
-atexit.register(lambda: scheduler.shutdown(wait=False))
-scheduler.add_job(func=hourly, trigger="cron", minute=39, timezone=utc)
-scheduler.start()
+
