@@ -1,8 +1,9 @@
 from __future__ import with_statement
 from alembic import context
-from sqlalchemy import engine_from_config, pool
+from sqlalchemy import engine_from_config, pool, event
 from logging.config import fileConfig
 import logging
+from sqlalchemy.orm import sessionmaker
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -69,6 +70,31 @@ def run_migrations_online():
                                 prefix='sqlalchemy.',
                                 poolclass=pool.NullPool,
                                 isolation_level="AUTOCOMMIT")
+
+    Session = sessionmaker(bind=engine, autocommit=True)
+
+    dconns_by_trans = {}
+
+    @event.listens_for(Session, 'after_begin')
+    def receive_after_begin(session, transaction, connection):
+        """When a transaction begins, turn autocommit off."""
+        dbapi_connection = connection.connection.connection
+        if transaction.nested:
+            assert not dbapi_connection.autocommit
+            return
+        assert dbapi_connection.autocommit
+        dbapi_connection.autocommit = False
+        dconns_by_trans.setdefault(transaction, set()).add(
+            dbapi_connection)
+
+    @event.listens_for(Session, 'after_transaction_end')
+    def receive_after_transaction_end(session, transaction):
+        """Restore autocommit where this transaction turned it off."""
+        if transaction in dconns_by_trans:
+            for dbapi_connection in dconns_by_trans[transaction]:
+                assert not dbapi_connection.autocommit
+                dbapi_connection.autocommit = True
+            del dconns_by_trans[transaction]
 
     connection = engine.connect()
     context.configure(connection=connection,
