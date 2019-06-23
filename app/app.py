@@ -23,7 +23,7 @@ def create_app(config_class=Config):
     scheduler = BackgroundScheduler()
     # Shut down the scheduler when exiting the app
     atexit.register(lambda: scheduler.shutdown(wait=False))
-    scheduler.add_job(func=hourly, trigger="cron", minute=44, timezone=utc)
+    scheduler.add_job(func=hourly, args=[app], trigger="cron", minute=55, timezone=utc)
     scheduler.start()
     return app
 
@@ -53,7 +53,7 @@ def register_shellcontext(app):
     app.shell_context_processor(shell_context)
 
 
-def hourly():
+def hourly(app):
 
     # app = create_app()
     # app.app_context().push()
