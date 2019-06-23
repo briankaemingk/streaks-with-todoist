@@ -84,7 +84,7 @@ def hourly():
                             task.update(date_string=task['date_string'] + ' starting tod')
                             print("Updated to new date: ", task['date_string'])
                             api.commit()
-    db.session.commit()
+    db.session.remove()
 
 scheduler = BackgroundScheduler()
 # Shut down the scheduler when exiting the app
