@@ -20,11 +20,6 @@ def create_app(config_class=Config):
     register_extensions(app)
     register_shellcontext(app)
     register_blueprints(app)
-    scheduler = BackgroundScheduler()
-    # Shut down the scheduler when exiting the app
-    atexit.register(lambda: scheduler.shutdown(wait=False))
-    scheduler.add_job(func=hourly, args=[app], trigger="interval", minutes=1, timezone=utc)
-    scheduler.start()
     return app
 
 
@@ -53,8 +48,9 @@ def register_shellcontext(app):
     app.shell_context_processor(shell_context)
 
 
-def hourly(app):
+def hourly():
 
+    app = create_app()
     app.app_context().push()
 
     print('Timer run')
@@ -90,6 +86,11 @@ def hourly(app):
                             api.commit()
     db.session.remove()
 
+scheduler = BackgroundScheduler()
+# Shut down the scheduler when exiting the app
+atexit.register(lambda: scheduler.shutdown(wait=False))
+scheduler.add_job(func=hourly, trigger="interval", minutes=1, timezone=utc)
+scheduler.start()
 
 
 
