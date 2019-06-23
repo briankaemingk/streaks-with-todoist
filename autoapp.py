@@ -9,8 +9,3 @@ app = create_app()
 app.app_context().push()
 
 
-scheduler = BackgroundScheduler()
-# Shut down the scheduler when exiting the app
-atexit.register(lambda: scheduler.shutdown(wait=False))
-scheduler.add_job(func=hourly, args=app, trigger="cron", minute=34, timezone=utc)
-scheduler.start()

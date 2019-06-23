@@ -48,7 +48,7 @@ def register_shellcontext(app):
     app.shell_context_processor(shell_context)
 
 
-def hourly(app):
+def hourly():
 
     # app = create_app()
     # app.app_context().push()
@@ -88,5 +88,8 @@ def hourly(app):
 
 
 
-
-
+scheduler = BackgroundScheduler()
+# Shut down the scheduler when exiting the app
+atexit.register(lambda: scheduler.shutdown(wait=False))
+scheduler.add_job(func=hourly, trigger="cron", minute=39, timezone=utc)
+scheduler.start()
