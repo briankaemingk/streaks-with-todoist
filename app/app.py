@@ -86,9 +86,10 @@ def hourly():
                             api.commit()
 
 scheduler = BackgroundScheduler()
+# Shut down the scheduler when exiting the app
+atexit.register(lambda: scheduler.shutdown(wait=False))
 scheduler.add_job(func=hourly, trigger="cron", minute=0, timezone=utc)
 scheduler.start()
 
-# Shut down the scheduler when exiting the app
-atexit.register(lambda: scheduler.shutdown())
+
 

@@ -67,7 +67,8 @@ def run_migrations_online():
 
     engine = engine_from_config(config.get_section(config.config_ini_section),
                                 prefix='sqlalchemy.',
-                                poolclass=pool.NullPool)
+                                poolclass=pool.NullPool,
+                                isolation_level="AUTOCOMMIT")
 
     connection = engine.connect()
     context.configure(connection=connection,
