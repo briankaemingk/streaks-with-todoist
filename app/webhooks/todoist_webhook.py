@@ -132,6 +132,11 @@ def convert_datetime_str(date):
     return date.strftime('%Y-%m-%dT%H:%M:%S')
 
 
+def convert_datetime_str_notime(date):
+    """Convert a datetime object into the todoist due date string format"""
+    return date.strftime('%Y-%m-%d')
+
+
 def create_url():
     # Generate 6 random digits
     state = (''.join(random.choices(string.ascii_uppercase + string.digits, k=6)))
@@ -162,9 +167,13 @@ def task_updated(api, task_id):
                         if last_due_date == None or last_due_date != task["due_date_utc"]:
                             for filter in api.filters.state['filters']:
                                 if filter['name'] == 'Vacation':
-                                    return_date = task['date_string']
+                                    return_date_label = task['date_string']
+                                    return_date = task['due_date_utc']
                                     #todo: convert to date, add to dates
-                                    filter.update(query="search:Return date - " + return_date + RIGHT_SPACER + " | search: _____ | due before: " + return_date + 1 + " | (@ tDE & ! no due date) | (" + return_date + 1 + " & @t2D) | (due before: " + return_date + 6 + " & @t5D) | (due before: " + return_date + 8 + " & @tW) | (due before: " + return_date + 32 + " & @tM)")
+ #                                   print("search:Return date - " + return_date_label + RIGHT_SPACER + " | search: _____ | due before: " + add_to_dtobject(api, return_date, 1) + " | (@ tDE & ! no due date) | (" + add_to_dtobject(api, return_date, 1) + " & @t2D) | (due before: " + add_to_dtobject(api, return_date, 6) + " & @t5D) | (due before: " + add_to_dtobject(api, return_date, 8) + " & @tW) | (due before: " + add_to_dtobject(return_date, 32) + " & @tM)")
+                                    filter.update(query="search:Return date - " + return_date_label + RIGHT_SPACER + " | search: _____ | due before: " + add_to_dtobject(api, return_date, 1) + " | (@ tDE & ! no due date) | (" + add_to_dtobject(api, return_date, 1) + " & @t2D) | (due before: " + add_to_dtobject(api, return_date, 6) + " & @t5D) | (due before: " + add_to_dtobject(api, return_date, 8) + " & @tW) | (due before: " + add_to_dtobject(api, return_date, 32) + " & @tM)")
+                                    api.commit()
+
 
                 # Regular behavior for date added
                 elif 'P4' not in task['content']:
@@ -185,6 +194,11 @@ def task_updated(api, task_id):
 def is_recurrence_diff(task_content):
     """Find hours, minutes and, optionally, seconds"""
     return re.search(r'<(\d+:\d+:*\d*)*>', task_content)
+
+def add_to_dtobject(api, date_str, add_num):
+    date = convert_time_str_datetime(date_str, get_user_timezone(api))
+    new_date = date + timedelta(days=add_num)
+    return convert_datetime_str_notime(new_date)
 
 
 def replace_due_date_time(new_due_time, due_date_utc, user_timezone):
