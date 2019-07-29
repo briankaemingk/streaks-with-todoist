@@ -170,7 +170,6 @@ def task_updated(api, task_id):
                                     return_date_label = task['date_string']
                                     return_date = task['due_date_utc']
                                     #todo: convert to date, add to dates
- #                                   print("search:Return date - " + return_date_label + RIGHT_SPACER + " | search: _____ | due before: " + add_to_dtobject(api, return_date, 1) + " | (@ tDE & ! no due date) | (" + add_to_dtobject(api, return_date, 1) + " & @t2D) | (due before: " + add_to_dtobject(api, return_date, 6) + " & @t5D) | (due before: " + add_to_dtobject(api, return_date, 8) + " & @tW) | (due before: " + add_to_dtobject(return_date, 32) + " & @tM)")
                                     filter.update(query="search:Return date - " + return_date_label + RIGHT_SPACER + " | search: _____ | due before: " + add_to_dtobject(api, return_date, 1) + " | (@ tDE & ! no due date) | (" + add_to_dtobject(api, return_date, 1) + " & @t2D) | (due before: " + add_to_dtobject(api, return_date, 6) + " & @t5D) | (due before: " + add_to_dtobject(api, return_date, 8) + " & @tW) | (due before: " + add_to_dtobject(api, return_date, 32) + " & @tM)")
                                     api.commit()
 
@@ -232,9 +231,9 @@ L1_BASE =  "(overdue | (due after: tod 23:59 & due before: tom 00:00))"
 L2_BASE = " | search:_____ | ((@tDE & ! no due date) | (tom & @t2D) | (next 5 days & @t5D) | (next 8 days & @tW) | (next 32 days & @tM))"
 L3_BASE = "| ((no due date & !(@TG & no due date) & !##WF - & !##Someday/Maybe & !no labels & !@AGENDAS & !@oADDON & !@wWF))"
 
-L1 =  L1_LABEL + L1_BASE
-L2 = L2_LABEL + L1_BASE + L2_BASE
-L3 = L3_LABEL + L1_BASE + L2_BASE + L3_BASE
+L1 =  '(' + L1_LABEL + L1_BASE + ')'
+L2 = '(' + L2_LABEL + L1_BASE + L2_BASE  + ')'
+L3 = '(' + L3_LABEL + L1_BASE + L2_BASE + L3_BASE + ')'
 
 L1_CLEAN =  L1_CLEAN_LABEL + '(' + L1_BASE + ')' + CLEAN_ADD
 L2_CLEAN = L2_CLEAN_LABEL + '(' + L1_BASE + L2_BASE + ')' + CLEAN_ADD
@@ -319,7 +318,7 @@ def strip_label_add_query(filter, query, label_string, add_string):
     filter.update(query=new_query)
 
 def add_label_add_query(filter, query, label_string, add_string):
-    filter.update(query=label_string + '(' + query + ')' + add_string)
+    filter.update(query=label_string + query + add_string)
 
 def increment_streak(task):
     """If a task is a habit, increase the streak by +1"""
