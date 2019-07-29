@@ -227,7 +227,7 @@ NO_COMP_ADD = " &  !@COMP"
 
 CLEAN_ADD = " & !(search:Cleared L1 | search:Cleared L2)"
 
-L1_BASE =  "(overdue | (due after: tod 23:59 & due before: tom 00:00))"
+L1_BASE =  "((overdue | (due after: tod 23:59 & due before: tom 00:00)) & ! ##crt)"
 L2_BASE = " | search:_____ | ((@tDE & ! no due date) | (tom & @t2D) | (next 5 days & @t5D) | (next 8 days & @tW) | (next 32 days & @tM))"
 L3_BASE = "| ((no due date & !(@TG & no due date) & !##WF - & !##Someday/Maybe & !no labels & !@AGENDAS & !@oADDON & !@wWF))"
 
@@ -235,8 +235,8 @@ L1 =  '(' + L1_LABEL + L1_BASE + ')'
 L2 = '(' + L2_LABEL + L1_BASE + L2_BASE  + ')'
 L3 = '(' + L3_LABEL + L1_BASE + L2_BASE + L3_BASE + ')'
 
-L1_CLEAN =  L1_CLEAN_LABEL + '(' + L1_BASE + ')' + CLEAN_ADD
-L2_CLEAN = L2_CLEAN_LABEL + '(' + L1_BASE + L2_BASE + ')' + CLEAN_ADD
+L1_CLEAN = '(' + L1_CLEAN_LABEL + '(' + L1_BASE + ')' + CLEAN_ADD + ')'
+L2_CLEAN = '(' + L2_CLEAN_LABEL + '(' + L1_BASE + L2_BASE + ')' + CLEAN_ADD + ')'
 
 # TODO: Extend feature to other users
 URL = "https://autoremotejoaomgcd.appspot.com/sendmessage?key=c8tCXPZCbOo:APA91bHo7mE18uWREnh4UJFUutEsBEj0M1mbDRKz7A5KRhHZXvkngSBdVbRnLJxrtJ7oQAwi3dCTYSz1D1rymnX1uRt7iATl_Efbkdx5IDHhnvQ53Dgyfxq-G401f0p01GXFZDmqiQ5r&message=OOO_toggle"
