@@ -170,7 +170,7 @@ def task_updated(api, task_id):
                                     return_date_label = task['date_string']
                                     return_date = task['due_date_utc']
                                     #todo: convert to date, add to dates
-                                    filter.update(query="search:Return date - " + return_date_label + RIGHT_SPACER + " | search: _____ | due before: " + add_to_dtobject(api, return_date, 1) + " | (@ tDE & ! no due date) | (" + add_to_dtobject(api, return_date, 1) + " & @t2D) | (due before: " + add_to_dtobject(api, return_date, 6) + " & @t5D) | (due before: " + add_to_dtobject(api, return_date, 8) + " & @tW) | (due before: " + add_to_dtobject(api, return_date, 32) + " & @tM)")
+                                    filter.update(query="search:Return date - " + return_date_label + '(' + RIGHT_SPACER + " | search: _____ | due before: " + add_to_dtobject(api, return_date, 1) + " | (@ tDE & ! no due date) | (" + add_to_dtobject(api, return_date, 1) + " & @t2D) | (due before: " + add_to_dtobject(api, return_date, 6) + " & @t5D) | (due before: " + add_to_dtobject(api, return_date, 8) + " & @tW) | (due before: " + add_to_dtobject(api, return_date, 32) + " & @tM) ) & ! ##crt")
                                     api.commit()
 
 
