@@ -407,7 +407,7 @@ def task_added(api, task_id):
 
 def reminder_fired(api, task_id):
     task = api.items.get_by_id(task_id)
-    match = re.search('{(.*)}', task['content'])
+    match = re.search('<(.*)>', task['content'])
     labels = api.state['labels']
     new_label_ids = []
 
