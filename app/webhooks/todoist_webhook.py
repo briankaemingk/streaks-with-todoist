@@ -407,11 +407,25 @@ def task_added(api, task_id):
 
 def reminder_fired(api, task_id):
     task = api.items.get_by_id(task_id)
-    now_date = get_now_user_timezone(api)
-    now_date_all_day = update_to_all_day(now_date)
-    now_string_all_day = convert_datetime_str(now_date_all_day)
-    print('Reminder - updating task from ', task['due_date_utc'], ' to ', now_string_all_day)
-    task.update(due_date_utc=now_string_all_day)
+    match = re.search('{(.*)}', task['content'])
+    labels = api.state['labels']
+    new_label_ids = []
+
+    if match is not None:
+        labels_texts = match.group(1).split(",")
+
+        for label in labels:
+            if label['name'] in labels_texts:
+                new_label_ids.append(label['id'])
+
+        if new_label_ids: task.update(labels=new_label_ids, content=re.sub(' ' + match.group(0), '', task['content']), date_string='')
+
+    else:
+        now_date = get_now_user_timezone(api)
+        now_date_all_day = update_to_all_day(now_date)
+        now_string_all_day = convert_datetime_str(now_date_all_day)
+        print('Reminder - updating task from ', task['due_date_utc'], ' to ', now_string_all_day)
+        task.update(due_date_utc=now_string_all_day)
 
 
 def daily():
