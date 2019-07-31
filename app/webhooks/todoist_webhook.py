@@ -418,7 +418,7 @@ def reminder_fired(api, task_id):
             if label['name'] in labels_texts:
                 new_label_ids.append(label['id'])
 
-        if new_label_ids: task.update(labels=new_label_ids, content=re.sub(' ' + match.group(0), '', task['content']), date_string='')
+        if new_label_ids: task.update(labels=new_label_ids, content=re.sub('\[' + match.group(1) + '\]', '', task['content']), date_string='')
 
     else:
         now_date = get_now_user_timezone(api)
