@@ -264,6 +264,7 @@ def task_complete(api, task_id):
             if check_recurring_task(api, task) and check_regular_intervals(task['date_string']): check_activity_log(api, task)
         increment_streak(task)
         increment_count(task)
+        print("FINAL task: " + task)
 
 
         # Turn on OOO
@@ -336,10 +337,14 @@ def increment_streak(task):
 
 def increment_count(task):
     """If a task is a count, increase the count by +1"""
+    print("in increment count")
     content = task['content']
     if is_count(content):
+        print("in IS COUNT " + task['content'])
         count = is_count(content)
+        print("Count: " + count)
         streak = int(count.group(1)) + 1
+        print("Streak: " + streak)
         update_streak(task, streak)
 
 
