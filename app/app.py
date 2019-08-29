@@ -75,7 +75,7 @@ def hourly(app):
                 user_timezone = get_user_timezone(api)
 
                 for task in tasks:
-                    if task['content'].startswith("Cleared L2"): task.update(date_string='ev! day starting tom')
+                    if task['content'].startswith("Cleared L2"): task.update(date_string='tom')
 
                     due_date_utc = task["due_date_utc"]
                     if due_date_utc:
