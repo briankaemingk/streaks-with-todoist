@@ -263,6 +263,8 @@ def task_complete(api, task_id):
         if api.state['user']['is_premium'] and task['date_string'] is not None:
             if check_recurring_task(api, task) and check_regular_intervals(task['date_string']): check_activity_log(api, task)
         increment_streak(task)
+        increment_count(task)
+
 
         # Turn on OOO
         if task['content'] == 'ooo mode' and api.projects.get_by_id(task['project_id'])['name'] == 'crt' :
