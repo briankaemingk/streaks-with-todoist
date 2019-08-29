@@ -83,6 +83,12 @@ def update_streak(task, streak):
     task.update(content=new_content)
 
 
+def update_count(task, count):
+    """Update count contents from text [n] to text [n+1]"""
+    count_num = '[{}]'.format(count)
+    new_content = re.sub(r'\[(\d+)\]', count_num, task['content'])
+    task.update(content=new_content)
+
 def get_now_user_timezone(api):
     """Get current time in user's timezone"""
     user_timezone = get_user_timezone(api)
@@ -342,9 +348,9 @@ def increment_count(task):
     if is_count(content):
         print("in IS COUNT " + task['content'])
         count = is_count(content)
-        streak = int(count.group(1)) + 1
-        print("Streak: " + str(streak))
-        update_streak(task, streak)
+        count = int(count.group(1)) + 1
+        print("Count: " + str(count))
+        update_count(task, count)
 
 
 def check_recurring_task(api, task):
