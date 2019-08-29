@@ -342,7 +342,6 @@ def increment_count(task):
     if is_count(content):
         print("in IS COUNT " + task['content'])
         count = is_count(content)
-        print("Count: " + count)
         streak = int(count.group(1)) + 1
         print("Streak: " + streak)
         update_streak(task, streak)
