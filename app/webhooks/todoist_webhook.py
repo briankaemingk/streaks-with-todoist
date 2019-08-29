@@ -264,7 +264,7 @@ def task_complete(api, task_id):
             if check_recurring_task(api, task) and check_regular_intervals(task['date_string']): check_activity_log(api, task)
         increment_streak(task)
         increment_count(task)
-        print("FINAL task: " + task)
+        print("FINAL task: " + task['content'])
 
 
         # Turn on OOO
