@@ -72,6 +72,10 @@ def is_habit(text):
     return re.search(r'\[streak\s(\d+)\]', text)
 
 
+def is_count(text):
+    return re.search(r'\[(\d+)\]', text)
+
+
 def update_streak(task, streak):
     """Update streak contents from text [streak n] to text [streak n+1]"""
     streak_num = '[streak {}]'.format(streak)
@@ -326,6 +330,14 @@ def increment_streak(task):
     if is_habit(content):
         habit = is_habit(content)
         streak = int(habit.group(1)) + 1
+        update_streak(task, streak)
+
+def increment_count(task):
+    """If a task is a count, increase the count by +1"""
+    content = task['content']
+    if is_count(content):
+        count = is_count(content)
+        streak = int(count.group(1)) + 1
         update_streak(task, streak)
 
 
