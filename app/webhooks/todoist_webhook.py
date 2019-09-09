@@ -114,13 +114,14 @@ def compute_hmac():
 
 def update_to_all_day(now):
     """Update due date to end of today (default for all day tasks)"""
-    new_due_date = datetime(year=now.year,
-                            month=now.month,
-                            day=now.day,
-                            hour=23,
-                            minute=59,
-                            second=59).astimezone(pytz.utc)
-    return new_due_date
+    return { "date" : now.strftime('%Y-%m-%d') }
+    # new_due_date = datetime(year=now.year,
+    #                         month=now.month,
+    #                         day=now.day,
+    #                         hour=23,
+    #                         minute=59,
+    #                         second=59).astimezone(pytz.utc)
+    #   return new_due_date
 
 
 def get_user_timezone(api):
@@ -157,7 +158,7 @@ def create_url():
 def task_updated(api, task_id):
     """TODO: Add logic for finding <> and replacing due time"""
     task = api.items.get_by_id(task_id)
-    if task["due_date_utc"] and is_recurrence_diff(task['content']):
+    if task["due"] and is_recurrence_diff(task['content']):
         new_due_time = is_recurrence_diff(task["content"]).group(1)
         new_due_date_utc = replace_due_date_time(new_due_time, task["due_date_utc"], get_user_timezone(api))
         new_due_date_utc_str = convert_datetime_str(new_due_date_utc)
@@ -438,14 +439,14 @@ def reminder_fired(api, task_id):
             if label['name'] in labels_texts:
                 new_label_ids.append(label['id'])
 
-        if new_label_ids: task.update(labels=new_label_ids, content=re.sub('\[' + match.group(1) + '\]', '', task['content']), date_string='')
+        if new_label_ids: task.update(labels=new_label_ids, content=re.sub('\[' + match.group(1) + '\]', '', task['content']), due=None)
 
     else:
         now_date = get_now_user_timezone(api)
         now_date_all_day = update_to_all_day(now_date)
-        now_string_all_day = convert_datetime_str(now_date_all_day)
-        print('Reminder - updating task from ', task['due_date_utc'], ' to ', now_string_all_day)
-        task.update(due_date_utc=now_string_all_day)
+        #now_string_all_day = convert_datetime_str(now_date_all_day)
+        print('Reminder - updating task from ', task['due'], ' to ', now_date_all_day)
+        task.update(due=now_date_all_day)
 
 
 def daily():
