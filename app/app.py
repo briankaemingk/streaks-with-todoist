@@ -4,6 +4,7 @@ from app.user.models import User
 from app.webhooks.todoist_webhook import get_now_user_timezone, initiate_api, convert_time_str_datetime, is_habit, update_streak, is_due_yesterday, update_to_all_day, get_user_timezone
 from app.config import Config
 from app.extensions import db, migrate
+from datetime import datetime, timedelta
 from redis import Redis
 import rq
 import atexit
@@ -66,6 +67,7 @@ def hourly(app):
             return 'Request for Streaks with Todoist not authorized, exiting.'
         else:
             now = get_now_user_timezone(api)
+            tomorrow = now + timedelta(days=1)
             user_timezone = get_user_timezone(api)
             print("User timezone: ", user_timezone, " Hour: ", now.hour)
 
@@ -75,9 +77,9 @@ def hourly(app):
                 user_timezone = get_user_timezone(api)
 
                 for task in tasks:
-                    if task['content'].startswith("Cleared L2"): task.update(date_string='tom')
+                    if task['content'].startswith("Cleared L2"): task.update(due=eval('{' + update_to_all_day(tomorrow) + ', "string" : "ev! other day" }'))
 
-                    due_date_utc = task["due_date_utc"]
+                    due_date_utc = task['due']['date']
                     if due_date_utc:
                         due_date = convert_time_str_datetime(due_date_utc, user_timezone)
                         # If the task is due yesterday and it is a habit
