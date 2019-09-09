@@ -62,7 +62,7 @@ def convert_time_str_datetime(time_str, user_timezone):
 
     try:
         # In format Fri 23 Nov 2018 18:00:00 +0000
-        datetime_obj = datetime.strptime(time_str, '%a %d %b %Y %H:%M:%S %z')
+        datetime_obj = datetime.strptime(time_str, '%a %d %b %Y %H:%M:%S')
     except ValueError or TypeError: return None
     dt_local = datetime_obj.astimezone(user_timezone)
     return dt_local
@@ -114,7 +114,7 @@ def compute_hmac():
 
 def update_to_all_day(now):
     """Update due date to end of today (default for all day tasks)"""
-    return { "date" : now.strftime('%Y-%m-%d') }
+    return  '"date" : "' + now.strftime('%Y-%m-%d') + '"'
     # new_due_date = datetime(year=now.year,
     #                         month=now.month,
     #                         day=now.day,
@@ -446,7 +446,7 @@ def reminder_fired(api, task_id):
         now_date_all_day = update_to_all_day(now_date)
         #now_string_all_day = convert_datetime_str(now_date_all_day)
         print('Reminder - updating task from ', task['due'], ' to ', now_date_all_day)
-        task.update(due=now_date_all_day)
+        task.update(due=eval('{'+ now_date_all_day +'}'))
 
 
 def daily():
