@@ -86,9 +86,8 @@ def hourly(app):
                         if is_habit(task['content']) and is_due_yesterday(due_date, now):
                             print('Updating overdue for task: ', task['content'])
                             update_streak(task, 0)
-                            task.update(due_date_utc=update_to_all_day(now))
-                            task.update(date_string=task['date_string'] + ' starting tod')
-                            print("Updated to new date: ", task['date_string'])
+                            task.update(due=eval('{' + update_to_all_day(now) + ', "string" : "' + task['due']['string'] + '" }'))
+                            print("Updated to new date: ", task['due'])
                             api.commit()
     db.session.remove()
 
