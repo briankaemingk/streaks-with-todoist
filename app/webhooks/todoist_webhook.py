@@ -477,7 +477,8 @@ def daily():
 
 
 def is_due_yesterday(due_date, now):
+    print("Due date: " + due_date)
     """If the due date is yesterday"""
     yesterday = now - timedelta(1)
-    yesterday.strftime('%m-%d-%y')
-    if due_date.strftime('%m-%d-%y') == yesterday.strftime('%m-%d-%y') : return 1
+    yesterday_string = yesterday.strftime('%m-%d-%y')
+    if due_date.strftime('%m-%d-%y') == yesterday_string : return 1
