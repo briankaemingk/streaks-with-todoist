@@ -24,7 +24,7 @@ def create_app(config_class=Config):
     scheduler = BackgroundScheduler()
     # Shut down the scheduler when exiting the app
     atexit.register(lambda: scheduler.shutdown(wait=False))
-    scheduler.add_job(func=hourly, args=[app], trigger="cron", minute=15, timezone=utc)
+    scheduler.add_job(func=hourly, args=[app], trigger="cron", minute=36, timezone=utc)
     scheduler.start()
     return app
 
@@ -77,10 +77,12 @@ def hourly(app):
                 user_timezone = get_user_timezone(api)
 
                 for task in tasks:
-                    if task['content'].startswith("Cleared L2"): task.update(due=eval('{' + update_to_all_day(tomorrow) + ', "string" : "ev! other day" }'))
+                    if task['content'].startswith("Cleared L2"):
+                        print('Updating Cleared L2 task')
+                        task.update(due=eval('{' + update_to_all_day(tomorrow) + ', "string" : "ev! other day" }'))
 
-                    due_date_utc = task['due']['date']
-                    if due_date_utc:
+                    if task['due'] is not None:
+                        due_date_utc = task['due']['date']
                         due_date = convert_time_str_datetime(due_date_utc, user_timezone)
                         # If the task is due yesterday and it is a habit
                         if is_habit(task['content']) and is_due_yesterday(due_date, now):
@@ -88,7 +90,7 @@ def hourly(app):
                             update_streak(task, 0)
                             task.update(due=eval('{' + update_to_all_day(now) + ', "string" : "' + task['due']['string'] + '" }'))
                             print("Updated to new date: ", task['due'])
-                            api.commit()
+                    api.commit()
     db.session.remove()
 
 
