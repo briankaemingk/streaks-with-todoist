@@ -63,7 +63,7 @@ def convert_time_str_datetime(time_str, user_timezone):
     if "T" in time_str :
         try:
             # In format Fri 23 Nov 2018 18:00:00 +0000
-            datetime_obj = datetime.strptime(time_str, '%Y-%m-%dT%H:%M:%S')
+            datetime_obj = datetime.strptime(time_str, '%Y-%m-%d')
         except ValueError or TypeError:
             return None
         dt_local = datetime_obj.astimezone(user_timezone)
@@ -71,7 +71,7 @@ def convert_time_str_datetime(time_str, user_timezone):
     else:
         try:
             # In format Fri 23 Nov 2018 18:00:00 +0000
-            datetime_obj = datetime.strptime(time_str, '%Y-%m-%d')
+            datetime_obj = datetime.strptime(time_str, '%Y-%m-%dT%H:%M:%S')
         except ValueError or TypeError:
             return None
         dt_local = datetime_obj.astimezone(user_timezone)
