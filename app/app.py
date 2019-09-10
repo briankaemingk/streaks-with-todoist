@@ -81,15 +81,19 @@ def hourly(app):
                         print('Updating Cleared L2 task')
                         task.update(due=eval('{' + update_to_all_day(tomorrow) + ', "string" : "ev! other day" }'))
 
-                    if task['due'] is not None:
-                        due_date_utc = task['due']['date']
-                        due_date = convert_time_str_datetime(due_date_utc, user_timezone)
-                        # If the task is due yesterday and it is a habit
-                        if is_habit(task['content']) and is_due_yesterday(due_date, now):
-                            print('Updating overdue for task: ', task['content'])
-                            update_streak(task, 0)
-                            task.update(due=eval('{' + update_to_all_day(now) + ', "string" : "' + task['due']['string'] + '" }'))
-                            print("Updated to new date: ", task['due'])
+                    try:
+                        if task['checked'] == 0 and task['is_deleted'] == 0:
+                            if task['due']:
+                                due_date_utc = task['due']['date']
+                                due_date = convert_time_str_datetime(due_date_utc, user_timezone)
+                                # If the task is due yesterday and it is a habit
+                                if is_habit(task['content']) and is_due_yesterday(due_date, now):
+                                    print('Updating overdue for task: ', task['content'])
+                                    update_streak(task, 0)
+                                    task.update(due=eval('{' + update_to_all_day(now) + ', "string" : "' + task['due']['string'] + '" }'))
+                                    print("Updated to new date: ", task['due'])
+                    except KeyError: print("KeyError: " + task['id'] + task['content'])
+
                     api.commit()
     db.session.remove()
 
