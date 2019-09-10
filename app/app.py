@@ -24,7 +24,7 @@ def create_app(config_class=Config):
     scheduler = BackgroundScheduler()
     # Shut down the scheduler when exiting the app
     atexit.register(lambda: scheduler.shutdown(wait=False))
-    scheduler.add_job(func=hourly, args=[app], trigger="cron", minute=56, timezone=utc)
+    scheduler.add_job(func=hourly, args=[app], trigger="cron", minute=44, timezone=utc)
     scheduler.start()
     return app
 
@@ -77,24 +77,25 @@ def hourly(app):
                 user_timezone = get_user_timezone(api)
 
                 for task in tasks:
-                    if task['content'].startswith("Cleared L2"):
-                        print('Updating Cleared L2 task')
-                        task.update(due=eval('{' + update_to_all_day(tomorrow) + ', "string" : "ev! other day" }'))
-
-                    try:
-                        if task['checked'] == 0 and task['is_deleted'] == 0:
-                            if task['due']:
-                                due_date_utc = task['due']['date']
-                                due_date = convert_time_str_datetime(due_date_utc, user_timezone)
-                                # If the task is due yesterday and it is a habit
-                                if is_habit(task['content']) and is_due_yesterday(due_date, now):
-                                    print('Updating overdue for task: ', task['content'])
-                                    update_streak(task, 0)
-                                    task.update(due=eval('{' + update_to_all_day(now) + ', "string" : "' + task['due']['string'] + '" }'))
-                                    print("Updated to new date: ", task['due'])
-                    except KeyError: print("KeyError: " + task['id'] + task['content'])
-
-                    api.commit()
+                    if task['is_deleted'] == 0:
+                        try:
+                            if task['checked'] == 0:
+                                if task['due']:
+                                    if task['content'].startswith("Cleared L2"):
+                                        print('Updating Cleared L2 task')
+                                        task.update(due=eval('{' + update_to_all_day(tomorrow) + ', "string" : "ev! other day" }'))
+                                        api.commit()
+                                    else:
+                                        due_date_utc = task['due']['date']
+                                        due_date = convert_time_str_datetime(due_date_utc, user_timezone)
+                                        # If the task is due yesterday and it is a habit
+                                        if is_habit(task['content']) and is_due_yesterday(due_date, now):
+                                            print('Updating overdue for task: ', task['content'])
+                                            update_streak(task, 0)
+                                            task.update(due=eval('{' + update_to_all_day(now) + ', "string" : "' + task['due']['string'] + '" }'))
+                                            print("Updated to new date: ", task['due'])
+                                        api.commit()
+                        except KeyError: print(str(task))
     db.session.remove()
 
 
