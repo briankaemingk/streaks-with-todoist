@@ -187,7 +187,7 @@ def task_updated(api, task_id):
                         if last_due_date == None or last_due_date != task["due_date_utc"]:
                             for filter in api.filters.state['filters']:
                                 if filter['name'] == 'Vacation':
-                                    return_date_label = task['date_string']
+                                    return_date_label = task['due']['string']
                                     return_date = task['due']['date']
                                     #todo: convert to date, add to dates
                                     filter.update(query="search:Return date - " + return_date_label + RIGHT_SPACER + " | ( search: _____ | due before: " + add_to_dtobject(api, return_date, 1) + " | (@ tDE & ! no due date) | (" + add_to_dtobject(api, return_date, 1) + " & @t2D) | (due before: " + add_to_dtobject(api, return_date, 6) + " & @t5D) | (due before: " + add_to_dtobject(api, return_date, 8) + " & @tW) | (due before: " + add_to_dtobject(api, return_date, 32) + " & @tM) ) & ! ##crt")
@@ -276,8 +276,8 @@ def reset_base_filters(api):
 def task_complete(api, task_id):
     task = api.items.get_by_id(int(task_id))
     if task is not None:
-        if api.state['user']['is_premium'] and task['date_string'] is not None:
-            if check_recurring_task(api, task) and check_regular_intervals(task['date_string']): check_activity_log(api, task)
+        if api.state['user']['is_premium'] and task['due']:
+            if check_recurring_task(api, task) and check_regular_intervals(task['due']['string']): check_activity_log(api, task)
         increment_streak(task)
         increment_count(task)
 
@@ -361,8 +361,7 @@ def increment_count(task):
 
 def check_recurring_task(api, task):
     """Check if it is a recurring task: if not able to parse date string into a date, then it is a recurring task"""
-    if not(
-    convert_time_str_datetime(task['date_string'], get_user_timezone(api))): return 1
+    return task['due']['is_recurring']
 
 
 def check_regular_intervals(date_str):
