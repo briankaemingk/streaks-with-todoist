@@ -179,7 +179,7 @@ def task_updated(api, task_id):
     user_email = api['user']['email']
     if user_email == 'brian.e.k@gmail.com' or user_email == 'bek4@alumni.calvin.edu' or user_email == 'brian.kaemingk.2012@marshall.usc.edu':
         if api.state['user']['is_premium']:
-            if task["due_date_utc"] != None :
+            if task["due"]:
                 # Special behavior for return date filter
                 if task['content'] == 'return date' and api.projects.get_by_id(task['project_id'])['name'] == 'crt':
                     if 'last_due_date' in api.activity.get(object_id=task['id'], limit=1)[0]['extra_data']:
@@ -188,7 +188,7 @@ def task_updated(api, task_id):
                             for filter in api.filters.state['filters']:
                                 if filter['name'] == 'Vacation':
                                     return_date_label = task['date_string']
-                                    return_date = task['due_date_utc']
+                                    return_date = task['due']['date']
                                     #todo: convert to date, add to dates
                                     filter.update(query="search:Return date - " + return_date_label + RIGHT_SPACER + " | ( search: _____ | due before: " + add_to_dtobject(api, return_date, 1) + " | (@ tDE & ! no due date) | (" + add_to_dtobject(api, return_date, 1) + " & @t2D) | (due before: " + add_to_dtobject(api, return_date, 6) + " & @t5D) | (due before: " + add_to_dtobject(api, return_date, 8) + " & @tW) | (due before: " + add_to_dtobject(api, return_date, 32) + " & @tM) ) & ! ##crt")
                                     api.commit()
