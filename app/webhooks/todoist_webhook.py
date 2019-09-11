@@ -182,8 +182,8 @@ def task_updated(api, task_id):
             if task["due"]:
                 # Special behavior for return date filter
                 if task['content'] == 'return date' and api.projects.get_by_id(task['project_id'])['name'] == 'crt':
-                    if 'last_due_date' in api.activity.get(object_id=task['id'], limit=1)[0]['extra_data']:
-                        last_due_date = api.activity.get(object_id=task['id'], limit=1)[0]['extra_data']['last_due_date']
+                    if 'last_due_date' in api.activity.get(object_id=task['id'], limit=1)['events'][0]['extra_data']:
+                        last_due_date = api.activity.get(object_id=task['id'], limit=1)['events'][0]['extra_data']['last_due_date']
                         if last_due_date == None or last_due_date != task["due_date_utc"]:
                             for filter in api.filters.state['filters']:
                                 if filter['name'] == 'Vacation':
@@ -196,8 +196,8 @@ def task_updated(api, task_id):
 
                 # Regular behavior for date added
                 elif 'P4' not in task['content']:
-                    if 'last_due_date' in api.activity.get(object_id=task['id'], limit=1)[0]['extra_data']:
-                        if api.activity.get(object_id=task['id'], limit=1)[0]['extra_data']['last_due_date'] == None:
+                    if 'last_due_date' in api.activity.get(object_id=task['id'], limit=1)['events'][0]['extra_data']:
+                        if api.activity.get(object_id=task['id'], limit=1)['events'][0]['extra_data']['last_due_date'] == None:
                             task.update(priority=3)
                 else:
                     content_no_P4 = task['content'].replace('P4', '')
@@ -205,8 +205,8 @@ def task_updated(api, task_id):
 
             # Remove date
             else:
-                if 'last_due_date' in api.activity.get(object_id=task['id'], limit=1)[0]['extra_data']:
-                    if api.activity.get(object_id=task['id'], limit=1)[0]['extra_data']['last_due_date'] != None:
+                if 'last_due_date' in api.activity.get(object_id=task['id'], limit=1)['events'][0]['extra_data']:
+                    if api.activity.get(object_id=task['id'], limit=1)['events'][0]['extra_data']['last_due_date'] != None:
                         task.update(priority=0)
 
 
@@ -373,18 +373,18 @@ def check_regular_intervals(date_str):
 def check_activity_log(api, task):
     """Look back through the activity log to see if the current time is before the original due date. If so, skip the next occurence."""
     # Find last 2 completed objects in activity log, including this one
-    completed_logs = api.activity.get(object_type='item', event_type='completed', object_id=task['id'], limit=2)
+    completed_logs = api.activity.get(object_type='item', event_type='completed', object_id=task['id'], limit=2)['events']
 
     # Catch timeout error
     i = 1
     while completed_logs == '<html><head><title>Timeout</title></head><body><h1>Timeout</h1></body></html>':
         print("Completed logs TIMEOUT error, retry #", i)
         i += 1
-        completed_logs = api.activity.get(object_type='item', event_type='completed', object_id=task['id'], limit=2)
+        completed_logs = api.activity.get(object_type='item', event_type='completed', object_id=task['id'], limit=2)['events']
 
     # If there's only one record of completion (the one that caused this webhook to fire)
     if len(completed_logs) == 1:
-        update_logs = api.activity.get(object_type='item', event_type='updated', object_id=task['id'], limit=100)
+        update_logs = api.activity.get(object_type='item', event_type='updated', object_id=task['id'], limit=100)['events']
         date_update_logs = [update_log for update_log in update_logs if 'last_due_date' in update_log['extra_data']]
         # If there was a modification to a date
         if(date_update_logs):
@@ -399,7 +399,7 @@ def check_activity_log(api, task):
         last_complete_date = convert_time_str_datetime(completed_logs[-1]['event_date'], pytz.utc)
         last_completed_date_str = convert_datetime_str(last_complete_date)
         # Get all changes to this task since the last completion time
-        update_logs = api.activity.get(object_type='item', event_type='updated', object_id=task['id'], since=last_completed_date_str, limit=100)
+        update_logs = api.activity.get(object_type='item', event_type='updated', object_id=task['id'], since=last_completed_date_str, limit=100)['events']
         date_update_logs = [update_log for update_log in update_logs if 'last_due_date' in update_log['extra_data']]
         if(date_update_logs):
             # Get the last due date in the regular cycle
