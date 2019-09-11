@@ -427,7 +427,7 @@ def task_added(api, task_id):
     ##TODO: Extend feature to others
     user_email = api['user']['email']
     if user_email == 'brian.e.k@gmail.com' or user_email == 'bek4@alumni.calvin.edu' or user_email == 'brian.kaemingk.2012@marshall.usc.edu':
-        if task['due_date_utc'] != None :
+        if task['due']:
             if 'P4' not in task['content']:
                 task.update(priority=3)
             else:
