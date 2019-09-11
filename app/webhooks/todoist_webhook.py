@@ -249,7 +249,7 @@ L1_CLEAN_LABEL = "search:" + "Level 1 - clean" + RIGHT_SPACER + " | "
 L2_CLEAN_LABEL = "search:" + "Level 2 - clean" + RIGHT_SPACER + " | "
 
 OOO_LABEL = "search:_OOO_ |"
-OOO_ADD =  " &  !(tod & ##work & P4) & !(due after: tod & ##work)"
+OOO_ADD =  " &  !(tod & ##work & P4) & !(due after: tod & ##work) & !(no due date & ##work)"
 NO_COMP_LABEL = "search:_NO COMP_ |"
 NO_COMP_ADD = " &  !@COMP"
 
