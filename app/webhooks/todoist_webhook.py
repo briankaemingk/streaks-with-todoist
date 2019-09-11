@@ -57,13 +57,13 @@ def process_webhook(req, user):
     api.commit()
 
 
-def convert_time_str_datetime(time_str, user_timezone):
+def convert_time_str_datetime(due_date_utc, user_timezone):
     """Parse time string, convert to datetime object in user's timezone"""
 
-    if "T" in time_str :
+    if "T" in due_date_utc :
         try:
             # In format Fri 23 Nov 2018 18:00:00 +0000
-            datetime_obj = datetime.strptime(time_str, '%Y-%m-%d')
+            datetime_obj = datetime.strptime(due_date_utc, '%Y-%m-%dT%H:%M:%S')
         except ValueError or TypeError:
             return None
         dt_local = datetime_obj.astimezone(user_timezone)
@@ -71,7 +71,7 @@ def convert_time_str_datetime(time_str, user_timezone):
     else:
         try:
             # In format Fri 23 Nov 2018 18:00:00 +0000
-            datetime_obj = datetime.strptime(time_str, '%Y-%m-%dT%H:%M:%S')
+            datetime_obj = datetime.strptime(due_date_utc, '%Y-%m-%d')
         except ValueError or TypeError:
             return None
         dt_local = datetime_obj.astimezone(user_timezone)

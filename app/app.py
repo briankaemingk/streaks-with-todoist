@@ -24,7 +24,7 @@ def create_app(config_class=Config):
     scheduler = BackgroundScheduler()
     # Shut down the scheduler when exiting the app
     atexit.register(lambda: scheduler.shutdown(wait=False))
-    scheduler.add_job(func=hourly, args=[app], trigger="cron", minute=57, timezone=utc)
+    scheduler.add_job(func=hourly, args=[app], trigger="cron", minute=3, timezone=utc)
     scheduler.start()
     return app
 
@@ -89,7 +89,6 @@ def hourly(app):
                                         due_date_utc = task['due']['date']
                                         due_date = convert_time_str_datetime(due_date_utc, user_timezone)
                                         # If the task is due yesterday and it is a habit
-                                        print(str(task))
                                         if is_habit(task['content']) and is_due_yesterday(due_date, now):
                                             print('Updating overdue for task: ', task['content'])
                                             update_streak(task, 0)
