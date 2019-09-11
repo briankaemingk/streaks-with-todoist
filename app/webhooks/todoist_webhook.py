@@ -283,9 +283,10 @@ def reset_base_filters(api):
 
 def task_complete(api, task_id):
     task = api.items.get_by_id(int(task_id))
-    if task is not None:
-        if api.state['user']['is_premium'] and task['due']:
-            if check_recurring_task(api, task) and check_regular_intervals(task['due']['string']): check_activity_log(api, task)
+    if task:
+        #Disabling rarely used recurrence snooze due to recursion error
+        # if api.state['user']['is_premium'] and task['due']:
+        #     if check_recurring_task(api, task) and check_regular_intervals(task['due']['string']): check_activity_log(api, task)
         increment_streak(task)
         increment_count(task)
 
