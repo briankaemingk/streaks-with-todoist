@@ -24,7 +24,7 @@ def create_app(config_class=Config):
     scheduler = BackgroundScheduler()
     # Shut down the scheduler when exiting the app
     atexit.register(lambda: scheduler.shutdown(wait=False))
-    scheduler.add_job(func=hourly, args=[app], trigger="cron", minute=3, timezone=utc)
+    scheduler.add_job(func=hourly, args=[app], trigger="cron", minute=6, timezone=utc)
     scheduler.start()
     return app
 
