@@ -169,7 +169,7 @@ def task_updated(api, task_id):
     task = api.items.get_by_id(task_id)
     if task["due"] and is_recurrence_diff(task['content']):
         new_due_time = is_recurrence_diff(task["content"]).group(1)
-        new_due_date_utc = replace_due_date_time(new_due_time, task["due_date_utc"], get_user_timezone(api))
+        new_due_date_utc = replace_due_date_time(new_due_time, task["due"]['date'], get_user_timezone(api))
         new_due_date_utc_str = convert_datetime_str(new_due_date_utc)
         task.update(content=re.sub(is_recurrence_diff(task["content"]).group(0), '', task["content"]))
         task.update(due_date_utc=new_due_date_utc_str)
