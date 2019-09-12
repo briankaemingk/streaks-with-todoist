@@ -84,7 +84,6 @@ def hourly(app):
                                     if task['content'].startswith("Cleared L2"):
                                         print('Updating Cleared L2 task')
                                         task.update(due=eval('{' + update_to_all_day(tomorrow) + ', "string" : "ev! other day" }'))
-                                        api.commit()
                                     else:
                                         due_date = task['due']['date'][:10] if len(task['due']['date']) > 10 else task['due']['date']
                                         # If the task is due yesterday and it is a habit
@@ -94,8 +93,8 @@ def hourly(app):
                                             update_streak(task, 0)
                                             task.update(due=eval('{' + update_to_all_day(now) + ', "string" : "' + task['due']['string'] + '" }'))
                                             print("Updated to new date: ", task['due'])
-                                        api.commit()
                         except KeyError: print('KEY ERROR')
+            api.commit()
     db.session.remove()
 
 
