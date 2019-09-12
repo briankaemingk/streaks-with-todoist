@@ -86,8 +86,7 @@ def hourly(app):
                                         task.update(due=eval('{' + update_to_all_day(tomorrow) + ', "string" : "ev! other day" }'))
                                         api.commit()
                                     else:
-                                        due_date_utc = task['due']['date']
-                                        due_date = convert_time_str_datetime(due_date_utc, user_timezone)
+                                        due_date = task['due']['date'][:10] if len(task['due']['date']) > 10 else task['due']['date']
                                         # If the task is due yesterday and it is a habit
                                         print("Checking task: " + task['content'])
                                         if is_habit(task['content']) and is_due_yesterday(due_date, now):
