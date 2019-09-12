@@ -488,6 +488,9 @@ def is_due_yesterday(due_date, now):
     """If the due date is yesterday"""
     yesterday = now - timedelta(1)
     yesterday_string = yesterday.strftime('%m-%d-%y')
+    print("Checking if task is due yesterday")
+    print("Yesterday string: " + yesterday_string)
+    print("Due date string: " + due_date.strftime('%m-%d-%y'))
     if due_date.strftime('%m-%d-%y') == yesterday_string :
         return 1
     else:

@@ -89,6 +89,7 @@ def hourly(app):
                                         due_date_utc = task['due']['date']
                                         due_date = convert_time_str_datetime(due_date_utc, user_timezone)
                                         # If the task is due yesterday and it is a habit
+                                        print("Checking task: " + task['content'])
                                         if is_habit(task['content']) and is_due_yesterday(due_date, now):
                                             print('Updating overdue for task: ', task['content'])
                                             update_streak(task, 0)
