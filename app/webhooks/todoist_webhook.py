@@ -185,7 +185,7 @@ def task_updated(api, task_id):
 
     ##TODO: Priority/convenience tasks: Extend feature to others
     user_email = api['user']['email']
-    if user_email == 'brian.e.k@gmail.com' or user_email == 'bek4@alumni.calvin.edu' or user_email == 'brian.kaemingk.2012@marshall.usc.edu':
+    if user_email == os.getenv('PRIMARY_EMAIL') or user_email == os.getenv('EMAIL1') or user_email == os.getenv('EMAIL2'):
         if api.state['user']['is_premium']:
             if task["due"]:
                 # Special behavior for return date filter
@@ -289,9 +289,9 @@ def task_complete(api, task_id):
         increment_streak(task)
         increment_count(task)
 
-
         # Turn on OOO
         if task['content'] == 'ooo mode' and api.projects.get_by_id(task['project_id'])['name'] == 'crt' :
+            print("OOO ON request")
             for filter in api.filters.state['filters'] :
                 query = filter['query']
                 if filter['name'] == 'Level 1' : add_label_add_query(filter, query, OOO_LABEL, OOO_ADD)

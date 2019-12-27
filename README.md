@@ -19,10 +19,10 @@ sudo apt install postgresql postgresql-contrib
 4. Create a new [Todoist account](http://todoist.com) for testing purposes 
 5. Create a new app in the [Todoist app console](https://developer.todoist.com/appconsole.html):
     * Create a new app called Streaks with Todoist LOCAL
-    * Add an OAuth redirect URL: https://local-streaks-with-todoist.serveo.net/oauth_callback
+    * Add an OAuth redirect URL:  https://ef164ac5.ngrok.io/auth/oauth_callback
     * Click Save Settings
     * Scroll down to the Webhooks section: Select Webhooks version 7
-    * Set Webhook callback URL to https://local-streaks-with-todoist.serveo.net/webhook_callback
+    * Set Webhook callback URL to  https://ef164ac5.ngrok.io/webhooks/webhook_callback
     * Check the fields for item:added, item:complete, item:updated, reminder:fired
     * Click Save webhook configurations
 
@@ -48,7 +48,7 @@ sudo apt install postgresql postgresql-contrib
     CLIENT_ID=...jfdk34s...
     CLIENT_SECRET=...343j...
     ```    
-6. Start a tunnel using serveo: `ssh -R local-swt:80:localhost:5000 serveo.net` 
+6. Start a tunnel using ngrok: `ngrok http 5000` 
 7. Start the redis server with: `rq worker swt-tasks` (don't forget to start ssh with `sudo service ssh start`, postgresql with `sudo service postgresql start`, and redis with `sudo service redis-server start` )
 7. Run the app locally using `flask run`
 
@@ -64,9 +64,9 @@ sudo apt install postgresql postgresql-contrib
 4. Add the database add-on in heroku: `heroku addons:add heroku-postgresql:hobby-dev`
 5. Push the app: `git push heroku master`
 6. Log into the  Log into the [Todoist app console](https://developer.todoist.com/appconsole.html):
-    * Change the OAuth redirect URL to your heroku app url: https://heroku_app_name.herokuapp.com/oauth_callback
+    * Change the OAuth redirect URL to your heroku app url: https://heroku_app_name.herokuapp.com/auth/oauth_callback
     * Click Save Settings
-    * Scroll down to the Webhooks section and set the Webhook callback URL to your heroku app url: https://heroku_app_name.herokuapp.com/webhook_callback
+    * Scroll down to the Webhooks section and set the Webhook callback URL to your heroku app url: https://heroku_app_name.herokuapp.com/webhooks/webhook_callback
     * Click Save webhook configurations
     
 ### Database updates
