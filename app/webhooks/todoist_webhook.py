@@ -267,7 +267,7 @@ L1_CLEAN = '(' + L1_CLEAN_LABEL + '(' + L1_BASE + ')' + CLEAN_ADD + ')'
 L2_CLEAN = '(' + L2_CLEAN_LABEL + '(' + L1_BASE + L2_BASE + ')' + CLEAN_ADD + ')'
 
 # TODO: Extend feature to other users
-URL = "https://autoremotejoaomgcd.appspot.com/sendmessage?key=dT1cGABj914:APA91bHSlOcx_PYgNL1sahabhBmL3g9sdU5hVTcWBbk_vNLBxObTZicn5NSiW7Xt4uCvribEi3Yvnl2eu25xcgt4vmw553HunATPQmi-Xc9ywoaoAosrAm-w5jjEPSseJh7vSW2GJNXa&message=OOO_toggle"
+URL = os.getenv('AUTO_REMOTE_URL')
 
 def reset_base_filters(api):
     for filter in api.filters.state['filters']:
@@ -433,7 +433,7 @@ def task_added(api, task_id):
 
     ##TODO: Extend feature to others
     user_email = api['user']['email']
-    if user_email == 'brian.e.k@gmail.com' or user_email == 'bek4@alumni.calvin.edu' or user_email == 'brian.kaemingk.2012@marshall.usc.edu':
+    if user_email == os.getenv('PRIMARY_EMAIL') or user_email == os.getenv('EMAIL1') or user_email == os.getenv('EMAIL2'):
         if task['due']:
             if 'P4' not in task['content']:
                 task.update(priority=3)
