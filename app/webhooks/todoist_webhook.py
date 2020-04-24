@@ -257,7 +257,7 @@ CLEAN_ADD = " & !(search:Cleared L1 | search:Cleared L2)"
 
 L1_BASE =  "((due before: +0 hours | (due after: tod 23:59 & due before: tom 00:00)) & ! ##crt)"
 L2_BASE = " | search:_____ | ((@tDE & ! no due date) | (tom & @t2D) | (next 5 days & @t5D) | (next 8 days & @tW) | (next 32 days & @tM))"
-L3_BASE = "| ((no due date & !(@TG & no due date) & !##WF - & !##Someday/Maybe & !no labels & !@AGENDAS & !@oADDON & !@wWF))"
+L3_BASE = "| ((no due date & !(@TG & no due date) & !##WF - & !##Someday/Maybe & !no labels & !@AGENDAS & !@oADDON & !@WF))"
 
 L1 =  '(' + L1_LABEL + L1_BASE + ')'
 L2 = '(' + L2_LABEL + L1_BASE + L2_BASE  + ')'
