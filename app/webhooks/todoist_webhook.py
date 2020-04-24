@@ -63,7 +63,8 @@ def convert_time_str_datetime(due_date_utc, user_timezone):
     if "Z" in due_date_utc:
         try:
             # In format Fri 23 Nov 2018 18:00:00 +0000
-            datetime_obj = datetime.strptime(due_date_utc, '%Y-%m-%dT%H:%M:%SZ')
+            datetime_obj = datetime.strptime(
+                due_date_utc, '%Y-%m-%dT%H:%M:%SZ')
         except ValueError or TypeError:
             return None
         dt_local = datetime_obj.astimezone(user_timezone)
@@ -84,6 +85,7 @@ def convert_time_str_datetime(due_date_utc, user_timezone):
             return None
         dt_local = datetime_obj.astimezone(user_timezone)
         return dt_local
+
 
 def is_habit(text):
     return re.search(r'\[streak\s(\d+)\]', text)
@@ -106,6 +108,7 @@ def update_count(task, count):
     new_content = re.sub(r'\[(\d+)\]', count_num, task['content'])
     task.update(content=new_content)
 
+
 def get_now_user_timezone(api):
     """Get current time in user's timezone"""
     user_timezone = get_user_timezone(api)
@@ -116,22 +119,27 @@ def initiate_api(access_token):
     """Initiate and sync Todoist API"""
     api = TodoistAPI(access_token)
     api.sync()
-    if bool(api['user']) : return api
-    else: return None
+    if bool(api['user']):
+        return api
+    else:
+        return None
 
 
 def compute_hmac():
     """Take payload and compute hmac--check if user-agent matches to todoist webhooks"""
     if request.headers.get('USER-AGENT') == 'Todoist-Webhooks':
         request_hmac = request.headers.get('X-Todoist-Hmac-SHA256')
-        calculated_hmac = base64.b64encode(hmac.new(bytes(os.getenv('CLIENT_SECRET'), encoding='utf-8'), msg=request.get_data(), digestmod=hashlib.sha256).digest()).decode("utf-8")
-        if request_hmac == calculated_hmac: return 1
-        else: return 0
+        calculated_hmac = base64.b64encode(hmac.new(bytes(os.getenv(
+            'CLIENT_SECRET'), encoding='utf-8'), msg=request.get_data(), digestmod=hashlib.sha256).digest()).decode("utf-8")
+        if request_hmac == calculated_hmac:
+            return 1
+        else:
+            return 0
 
 
 def update_to_all_day(now):
     """Update due date to end of today (default for all day tasks)"""
-    return  '"date" : "' + now.strftime('%Y-%m-%d') + '"'
+    return '"date" : "' + now.strftime('%Y-%m-%d') + '"'
     # new_due_date = datetime(year=now.year,
     #                         month=now.month,
     #                         day=now.day,
@@ -147,12 +155,15 @@ def get_user_timezone(api):
     match = re.search("GMT( ((\+|\-)(\d+)))?", todoist_tz)
 
     if match:
-        if match.group(3) == '+': operation = '-'
-        else: operation = '+'
+        if match.group(3) == '+':
+            operation = '-'
+        else:
+            operation = '+'
         GMT_tz = 'Etc/GMT' + operation + match.group(4)
         return pytz.timezone(GMT_tz)
 
-    else: return pytz.timezone(api.state["user"]["tz_info"]["timezone"])
+    else:
+        return pytz.timezone(api.state["user"]["tz_info"]["timezone"])
 
 
 def convert_datetime_str(date):
@@ -168,7 +179,8 @@ def convert_datetime_str_notime(date):
 def create_url():
     # Generate 6 random digits
     state = (''.join(random.choices(string.ascii_uppercase + string.digits, k=6)))
-    url = 'https://todoist.com/oauth/authorize?state=' + state + '&client_id=' + os.getenv('CLIENT_ID') + '&scope=data:read_write'
+    url = 'https://todoist.com/oauth/authorize?state=' + state + \
+        '&client_id=' + os.getenv('CLIENT_ID') + '&scope=data:read_write'
     return url
 
 
@@ -177,13 +189,13 @@ def task_updated(api, task_id):
     task = api.items.get_by_id(task_id)
     if task["due"] and is_recurrence_diff(task['content']):
         new_due_time = is_recurrence_diff(task["content"]).group(1)
-        new_due_date_utc = replace_due_date_time(new_due_time, task["due"]['date'], get_user_timezone(api))
+        new_due_date_utc = replace_due_date_time(
+            new_due_time, task["due"]['date'], get_user_timezone(api))
         new_due_date_utc_str = convert_datetime_str(new_due_date_utc)
-        task.update(content=re.sub(is_recurrence_diff(task["content"]).group(0), '', task["content"]))
+        task.update(content=re.sub(is_recurrence_diff(
+            task["content"]).group(0), '', task["content"]))
         task.update(due_date_utc=new_due_date_utc_str)
-
-
-    ##TODO: Priority/convenience tasks: Extend feature to others
+    # TODO: Priority/convenience tasks: Extend feature to others
     user_email = api['user']['email']
     if user_email == os.getenv('PRIMARY_EMAIL') or user_email == os.getenv('EMAIL1') or user_email == os.getenv('EMAIL2'):
         if api.state['user']['is_premium']:
@@ -191,16 +203,17 @@ def task_updated(api, task_id):
                 # Special behavior for return date filter
                 if task['content'] == 'return date' and api.projects.get_by_id(task['project_id'])['name'] == 'crt':
                     if 'last_due_date' in api.activity.get(object_id=task['id'], limit=1)['events'][0]['extra_data']:
-                        last_due_date = api.activity.get(object_id=task['id'], limit=1)['events'][0]['extra_data']['last_due_date']
+                        last_due_date = api.activity.get(object_id=task['id'], limit=1)[
+                            'events'][0]['extra_data']['last_due_date']
                         if last_due_date == None or last_due_date != task["due_date_utc"]:
                             for filter in api.filters.state['filters']:
                                 if filter['name'] == 'Vacation':
                                     return_date_label = task['due']['string']
                                     return_date = task['due']['date']
-                                    #todo: convert to date, add to dates
-                                    filter.update(query="search:Return date - " + return_date_label + RIGHT_SPACER + " | ( search: _____ | due before: " + add_to_dtobject(api, return_date, 1) + " | (@ tDE & ! no due date) | (" + add_to_dtobject(api, return_date, 1) + " & @t2D) | (due before: " + add_to_dtobject(api, return_date, 6) + " & @t5D) | (due before: " + add_to_dtobject(api, return_date, 8) + " & @tW) | (due before: " + add_to_dtobject(api, return_date, 32) + " & @tM) ) & ! ##crt")
+                                    # todo: convert to date, add to dates
+                                    filter.update(query="search:Return date - " + return_date_label + RIGHT_SPACER + " | ( search: _____ | due before: " + add_to_dtobject(api, return_date, 1) + " | (@ tDE & ! no due date) | (" + add_to_dtobject(
+                                        api, return_date, 1) + " & @t2D) | (due before: " + add_to_dtobject(api, return_date, 6) + " & @t5D) | (due before: " + add_to_dtobject(api, return_date, 8) + " & @tW) | (due before: " + add_to_dtobject(api, return_date, 32) + " & @tM) ) & ! ##crt")
                                     api.commit()
-
 
                 # Regular behavior for date added
                 elif 'P4' not in task['content']:
@@ -222,6 +235,7 @@ def is_recurrence_diff(task_content):
     """Find hours, minutes and, optionally, seconds"""
     return re.search(r'<(\d+:\d+:*\d*)*>', task_content)
 
+
 def add_to_dtobject(api, date_str, add_num):
     date = convert_time_str_datetime(date_str, get_user_timezone(api))
     new_date = date + timedelta(days=add_num)
@@ -230,16 +244,20 @@ def add_to_dtobject(api, date_str, add_num):
 
 def replace_due_date_time(new_due_time, due_date_utc, user_timezone):
     """Replace with the user-entered hour, minute and, optionally, second, and convert to utc datetime object"""
-    due_date_localtz_date = convert_time_str_datetime(due_date_utc, user_timezone)
+    due_date_localtz_date = convert_time_str_datetime(
+        due_date_utc, user_timezone)
     if(new_due_time):
         new_due_time_split = new_due_time.split(":")
         new_due_date_localtz_date = due_date_localtz_date.replace(hour=int(new_due_time_split[0]),
-                                                              minute=int(new_due_time_split[1]),
-                                                              second= int(0))
+                                                                  minute=int(
+                                                                      new_due_time_split[1]),
+                                                                  second=int(0))
     else:
-        new_due_date_localtz_date = due_date_localtz_date.replace(hour=23, minute=23, second= 59)
+        new_due_date_localtz_date = due_date_localtz_date.replace(
+            hour=23, minute=23, second=59)
     new_due_date_utc_date = new_due_date_localtz_date.astimezone(pytz.utc)
     return new_due_date_utc_date
+
 
 RIGHT_SPACER = "_________________________________"
 L1_LABEL = "search:" + "Level 1" + RIGHT_SPACER + " | "
@@ -249,72 +267,90 @@ L1_CLEAN_LABEL = "search:" + "Level 1 - clean" + RIGHT_SPACER + " | "
 L2_CLEAN_LABEL = "search:" + "Level 2 - clean" + RIGHT_SPACER + " | "
 
 OOO_LABEL = "search:_OOO_ |"
-OOO_ADD =  " &  !(tod & ##work & P4) & !(due after: tod & ##work) & !(no due date & ##work)"
+OOO_ADD = " &  !(tod & ##work & P4) & !(due after: tod & ##work) & !(no due date & ##work)"
 NO_COMP_LABEL = "search:_NO COMP_ |"
 NO_COMP_ADD = " &  !@COMP"
 
 CLEAN_ADD = " & !(search:Cleared L1 | search:Cleared L2)"
 
-L1_BASE =  "((due before: +0 hours | (due after: tod 23:59 & due before: tom 00:00)) & ! ##crt)"
+L1_BASE = "((due before: +0 hours | (due after: tod 23:59 & due before: tom 00:00)) & ! ##crt)"
 L2_BASE = " | search:_____ | ((@tDE & ! no due date) | (tom & @t2D) | (next 5 days & @t5D) | (next 8 days & @tW) | (next 32 days & @tM))"
 L3_BASE = "| ((no due date & !(@TG & no due date) & !##WF - & !##Someday/Maybe & !no labels & !@AGENDAS & !@oADDON & !@WF))"
 
-L1 =  '(' + L1_LABEL + L1_BASE + ')'
-L2 = '(' + L2_LABEL + L1_BASE + L2_BASE  + ')'
+L1 = '(' + L1_LABEL + L1_BASE + ')'
+L2 = '(' + L2_LABEL + L1_BASE + L2_BASE + ')'
 L3 = '(' + L3_LABEL + L1_BASE + L2_BASE + L3_BASE + ')'
 
 L1_CLEAN = '(' + L1_CLEAN_LABEL + '(' + L1_BASE + ')' + CLEAN_ADD + ')'
-L2_CLEAN = '(' + L2_CLEAN_LABEL + '(' + L1_BASE + L2_BASE + ')' + CLEAN_ADD + ')'
+L2_CLEAN = '(' + L2_CLEAN_LABEL + \
+    '(' + L1_BASE + L2_BASE + ')' + CLEAN_ADD + ')'
 
 # TODO: Extend feature to other users
 URL = os.getenv('AUTO_REMOTE_URL')
 
+
 def reset_base_filters(api):
     for filter in api.filters.state['filters']:
-        if filter['name'] == 'Level 1': filter.update(query=L1)
-        if filter['name'] == 'Level 2': filter.update(query=L2)
-        if filter['name'] == 'Level 3': filter.update(query=L3)
-        if filter['name'] == 'Level 1 - clean': filter.update(query=L1_CLEAN)
-        if filter['name'] == 'Level 2 - clean': filter.update(query=L2_CLEAN)
+        if filter['name'] == 'Level 1':
+            filter.update(query=L1)
+        if filter['name'] == 'Level 2':
+            filter.update(query=L2)
+        if filter['name'] == 'Level 3':
+            filter.update(query=L3)
+        if filter['name'] == 'Level 1 - clean':
+            filter.update(query=L1_CLEAN)
+        if filter['name'] == 'Level 2 - clean':
+            filter.update(query=L2_CLEAN)
     api.commit()
-
 
 
 def task_complete(api, task_id):
     task = api.items.get_by_id(int(task_id))
     if task:
-        #Disabling rarely used recurrence snooze due to recursion error
+        # Disabling rarely used recurrence snooze due to recursion error
         # if api.state['user']['is_premium'] and task['due']:
         #     if check_recurring_task(api, task) and check_regular_intervals(task['due']['string']): check_activity_log(api, task)
         increment_streak(task)
         increment_count(task)
 
         # Turn on OOO
-        if task['content'] == 'ooo mode' and api.projects.get_by_id(task['project_id'])['name'] == 'crt' :
+        if task['content'] == 'ooo mode' and api.projects.get_by_id(task['project_id'])['name'] == 'crt':
             print("OOO ON request")
-            for filter in api.filters.state['filters'] :
+            for filter in api.filters.state['filters']:
                 query = filter['query']
-                if filter['name'] == 'Level 1' : add_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
-                if filter['name'] == 'Level 2' : add_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
-                if filter['name'] == 'Level 3' : add_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
-                if filter['name'] == 'Level 1 - clean' : add_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
-                if filter['name'] == 'Level 2 - clean' : add_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
+                if filter['name'] == 'Level 1':
+                    add_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
+                if filter['name'] == 'Level 2':
+                    add_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
+                if filter['name'] == 'Level 3':
+                    add_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
+                if filter['name'] == 'Level 1 - clean':
+                    add_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
+                if filter['name'] == 'Level 2 - clean':
+                    add_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
 
-            #TODO: Extend feature this to other users
+            # TODO: Extend feature this to other users
             urllib.request.urlopen(URL).read()
 
-
         # Turn on no computer
-        if task['content'] == 'no computer' and api.projects.get_by_id(task['project_id'])['name'] == 'crt' :
-            for filter in api.filters.state['filters'] :
+        if task['content'] == 'no computer' and api.projects.get_by_id(task['project_id'])['name'] == 'crt':
+            for filter in api.filters.state['filters']:
                 query = filter['query']
-                if filter['name'] == 'Level 1' : add_label_add_query(filter, query, NO_COMP_LABEL, NO_COMP_ADD)
-                if filter['name'] == 'Level 2' : add_label_add_query(filter, query, NO_COMP_LABEL, NO_COMP_ADD)
-                if filter['name'] == 'Level 3' : add_label_add_query(filter, query, NO_COMP_LABEL, NO_COMP_ADD)
-                if filter['name'] == 'Level 1 - clean' : add_label_add_query(filter, query, NO_COMP_LABEL, NO_COMP_ADD)
-                if filter['name'] == 'Level 2 - clean' : add_label_add_query(filter, query, NO_COMP_LABEL, NO_COMP_ADD)
-
-
+                if filter['name'] == 'Level 1':
+                    add_label_add_query(
+                        filter, query, NO_COMP_LABEL, NO_COMP_ADD)
+                if filter['name'] == 'Level 2':
+                    add_label_add_query(
+                        filter, query, NO_COMP_LABEL, NO_COMP_ADD)
+                if filter['name'] == 'Level 3':
+                    add_label_add_query(
+                        filter, query, NO_COMP_LABEL, NO_COMP_ADD)
+                if filter['name'] == 'Level 1 - clean':
+                    add_label_add_query(
+                        filter, query, NO_COMP_LABEL, NO_COMP_ADD)
+                if filter['name'] == 'Level 2 - clean':
+                    add_label_add_query(
+                        filter, query, NO_COMP_LABEL, NO_COMP_ADD)
 
 
 def task_uncomplete(api, task_id):
@@ -323,11 +359,16 @@ def task_uncomplete(api, task_id):
     if task['content'] == 'ooo mode' and api.projects.get_by_id(task['project_id'])['name'] == 'crt':
         for filter in api.filters.state['filters']:
             query = filter['query']
-            if filter['name'] == 'Level 1': strip_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
-            if filter['name'] == 'Level 2': strip_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
-            if filter['name'] == 'Level 3': strip_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
-            if filter['name'] == 'Level 1 - clean': strip_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
-            if filter['name'] == 'Level 2 - clean': strip_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
+            if filter['name'] == 'Level 1':
+                strip_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
+            if filter['name'] == 'Level 2':
+                strip_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
+            if filter['name'] == 'Level 3':
+                strip_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
+            if filter['name'] == 'Level 1 - clean':
+                strip_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
+            if filter['name'] == 'Level 2 - clean':
+                strip_label_add_query(filter, query, OOO_LABEL, OOO_ADD)
 
         # TODO: Extend feature this to other users
         urllib.request.urlopen(URL).read()
@@ -336,19 +377,32 @@ def task_uncomplete(api, task_id):
     if task['content'] == 'no computer' and api.projects.get_by_id(task['project_id'])['name'] == 'crt':
         for filter in api.filters.state['filters']:
             query = filter['query']
-            if filter['name'] == 'Level 1': strip_label_add_query(filter, query, NO_COMP_LABEL, NO_COMP_ADD)
-            if filter['name'] == 'Level 2': strip_label_add_query(filter, query, NO_COMP_LABEL, NO_COMP_ADD)
-            if filter['name'] == 'Level 3': strip_label_add_query(filter, query, NO_COMP_LABEL, NO_COMP_ADD)
-            if filter['name'] == 'Level 1 - clean': strip_label_add_query(filter, query, NO_COMP_LABEL, NO_COMP_ADD)
-            if filter['name'] == 'Level 2 - clean': strip_label_add_query(filter, query, NO_COMP_LABEL, NO_COMP_ADD)
+            if filter['name'] == 'Level 1':
+                strip_label_add_query(
+                    filter, query, NO_COMP_LABEL, NO_COMP_ADD)
+            if filter['name'] == 'Level 2':
+                strip_label_add_query(
+                    filter, query, NO_COMP_LABEL, NO_COMP_ADD)
+            if filter['name'] == 'Level 3':
+                strip_label_add_query(
+                    filter, query, NO_COMP_LABEL, NO_COMP_ADD)
+            if filter['name'] == 'Level 1 - clean':
+                strip_label_add_query(
+                    filter, query, NO_COMP_LABEL, NO_COMP_ADD)
+            if filter['name'] == 'Level 2 - clean':
+                strip_label_add_query(
+                    filter, query, NO_COMP_LABEL, NO_COMP_ADD)
+
 
 def strip_label_add_query(filter, query, label_string, add_string):
     new_query = query.replace(label_string, '')
     new_query = new_query.replace(add_string, '')
     filter.update(query=new_query)
 
+
 def add_label_add_query(filter, query, label_string, add_string):
     filter.update(query=label_string + query + add_string)
+
 
 def increment_streak(task):
     """If a task is a habit, increase the streak by +1"""
@@ -357,6 +411,7 @@ def increment_streak(task):
         habit = is_habit(content)
         streak = int(habit.group(1)) + 1
         update_streak(task, streak)
+
 
 def increment_count(task):
     """If a task is a count, increase the count by +1"""
@@ -374,51 +429,62 @@ def check_recurring_task(api, task):
 
 def check_regular_intervals(date_str):
     """If a recurring task that repeats at regular intervals from the original task date is completed, it will not have an '!'"""
-    if '!' not in date_str : return 1
+    if '!' not in date_str:
+        return 1
 
 
 def check_activity_log(api, task):
     """Look back through the activity log to see if the current time is before the original due date. If so, skip the next occurence."""
     # Find last 2 completed objects in activity log, including this one
-    completed_logs = api.activity.get(object_type='item', event_type='completed', object_id=task['id'], limit=2)['events']
+    completed_logs = api.activity.get(
+        object_type='item', event_type='completed', object_id=task['id'], limit=2)['events']
 
     # Catch timeout error
     i = 1
     while completed_logs == '<html><head><title>Timeout</title></head><body><h1>Timeout</h1></body></html>':
         print("Completed logs TIMEOUT error, retry #", i)
         i += 1
-        completed_logs = api.activity.get(object_type='item', event_type='completed', object_id=task['id'], limit=2)['events']
+        completed_logs = api.activity.get(
+            object_type='item', event_type='completed', object_id=task['id'], limit=2)['events']
 
     # If there's only one record of completion (the one that caused this webhook to fire)
     if len(completed_logs) == 1:
-        update_logs = api.activity.get(object_type='item', event_type='updated', object_id=task['id'], limit=100)['events']
-        date_update_logs = [update_log for update_log in update_logs if 'last_due_date' in update_log['extra_data']]
+        update_logs = api.activity.get(
+            object_type='item', event_type='updated', object_id=task['id'], limit=100)['events']
+        date_update_logs = [
+            update_log for update_log in update_logs if 'last_due_date' in update_log['extra_data']]
         # If there was a modification to a date
         if(date_update_logs):
             # Get the last due date in the regular cycle
             if date_update_logs[-1]['extra_data']['last_due_date'] is not None:
                 last_regular_due_date_str = date_update_logs[-1]['extra_data']['last_due_date']
-                last_regular_due_date = convert_time_str_datetime(last_regular_due_date_str, pytz.utc)
+                last_regular_due_date = convert_time_str_datetime(
+                    last_regular_due_date_str, pytz.utc)
                 if datetime.now(tz=get_user_timezone(api)).date() < last_regular_due_date.date():
                     task.close()
     # Otherwise if there is more than one completion
     elif len(completed_logs) > 1:
-        last_complete_date = convert_time_str_datetime(completed_logs[-1]['event_date'], pytz.utc)
+        last_complete_date = convert_time_str_datetime(
+            completed_logs[-1]['event_date'], pytz.utc)
         last_completed_date_str = convert_datetime_str(last_complete_date)
         # Get all changes to this task since the last completion time
-        update_logs = api.activity.get(object_type='item', event_type='updated', object_id=task['id'], since=last_completed_date_str, limit=100)['events']
-        date_update_logs = [update_log for update_log in update_logs if 'last_due_date' in update_log['extra_data']]
+        update_logs = api.activity.get(object_type='item', event_type='updated',
+                                       object_id=task['id'], since=last_completed_date_str, limit=100)['events']
+        date_update_logs = [
+            update_log for update_log in update_logs if 'last_due_date' in update_log['extra_data']]
         if(date_update_logs):
             # Get the last due date in the regular cycle
             last_regular_due_date_str = date_update_logs[-1]['extra_data']['last_due_date']
-            last_regular_due_date = convert_time_str_datetime(last_regular_due_date_str, get_user_timezone(api))
+            last_regular_due_date = convert_time_str_datetime(
+                last_regular_due_date_str, get_user_timezone(api))
             if datetime.now(tz=get_user_timezone(api)).date() < last_regular_due_date.date():
                 task.close()
 
 
 def check_if_due_today(date, api):
     """Check if the task is due today"""
-    if date.date() == get_now_user_timezone(api): return 1
+    if date.date() == get_now_user_timezone(api):
+        return 1
 
 
 def task_added(api, task_id):
@@ -431,7 +497,7 @@ def task_added(api, task_id):
             task.update(content=content_no_comment)
             api.notes.add(task_id, comment[1:-1])
 
-    ##TODO: Extend feature to others
+    # TODO: Extend feature to others
     user_email = api['user']['email']
     if user_email == os.getenv('PRIMARY_EMAIL') or user_email == os.getenv('EMAIL1') or user_email == os.getenv('EMAIL2'):
         if task['due']:
@@ -455,14 +521,16 @@ def reminder_fired(api, task_id):
             if label['name'] in labels_texts:
                 new_label_ids.append(label['id'])
 
-        if new_label_ids: task.update(labels=new_label_ids, content=re.sub('\[' + match.group(1) + '\]', '', task['content']), due=None)
+        if new_label_ids:
+            task.update(labels=new_label_ids, content=re.sub(
+                '\[' + match.group(1) + '\]', '', task['content']), due=None)
 
-    else:
-        now_date = get_now_user_timezone(api)
-        now_date_all_day = update_to_all_day(now_date)
-        #now_string_all_day = convert_datetime_str(now_date_all_day)
-        print('Reminder - updating task from ', task['due'], ' to ', now_date_all_day)
-        task.update(due=eval('{'+ now_date_all_day +'}'))
+    # else:
+    #     now_date = get_now_user_timezone(api)
+    #     now_date_all_day = update_to_all_day(now_date)
+    #     #now_string_all_day = convert_datetime_str(now_date_all_day)
+    #     print('Reminder - updating task from ', task['due'], ' to ', now_date_all_day)
+    #     task.update(due=eval('{'+ now_date_all_day +'}'))
 
 
 def daily():
@@ -490,7 +558,7 @@ def is_due_yesterday(due_date, now):
     print("Checking if task is due yesterday")
     print("Yesterday string: " + yesterday_string)
     print("Due date string: " + due_date)
-    if due_date == yesterday_string :
+    if due_date == yesterday_string:
         return 1
     else:
         return 0
