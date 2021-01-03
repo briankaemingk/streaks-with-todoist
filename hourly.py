@@ -74,12 +74,12 @@ def register_blueprints(app):
 
 config_class=Config
 app = Flask(__name__.split('.')[0])
-# app.config.from_object(config_class)
-# app.redis = Redis.from_url(app.config['REDIS_URL'])
-# app.task_queue = rq.Queue('swt-tasks', connection=app.redis)
-# register_extensions(app)
-# register_shellcontext(app)
-# register_blueprints(app)
+app.config.from_object(config_class)
+app.redis = Redis.from_url(app.config['REDIS_URL'])
+app.task_queue = rq.Queue('swt-tasks', connection=app.redis)
+register_extensions(app)
+register_shellcontext(app)
+register_blueprints(app)
 
 hourly(app)
 
